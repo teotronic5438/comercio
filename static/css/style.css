@@ -1,0 +1,83 @@
+/*********************
+    HEADER
+*********************/
+.header-logo{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    background: rgb(200, 201, 203); /* color fundido con el logo - VER*/
+}
+.img-logo{
+    width: 50px;
+    height: 50px;
+    margin-right: 10px;
+    -webkit-mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 1), rgba(0, 0, 0, 0));
+    mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 1), rgba(0, 0, 0, 0));
+}
+.titulo-logo{
+    text-align: start;
+}
+.login-container a{
+  text-decoration: none;
+}
+.login-container a:hover{
+  color: #e02626;
+}
+
+/*********************
+    MENU DASHBOARD
+*********************/
+#sidebar {
+    min-height: 100vh;
+    transition: all 0.3s;
+}
+#sidebar.collapsed {
+  width: 0 !important;
+  padding: 0 !important;
+  opacity: 0;
+  transition: all 0.3s ease;
+}
+#sidebar {
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+#sidebar .nav-link {
+    transition: all 0.3s ease;
+    padding: 10px 15px;
+    border-left: 3px solid transparent;
+}
+
+#sidebar .nav-link:hover {
+    background-color: #495057; /* más claro que bg-secondary */
+    color: #ffc107 !important; /* color destacado: amarillo */
+    border-left: 3px solid #ffc107;
+    font-weight: bold;
+}
+
+/*********************
+    Footer
+*********************/
+.footer {
+  background-color: rgb(200, 201, 203); /* tu color base */
+  color: #2c2c2c; /* texto oscuro para contraste */
+  font-family: sans-serif;
+  font-size: 14px;
+  border-top: 1px solid #aaa;
+}
+
+.footer-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.footer-links a {
+  text-decoration: none;
+  color: #2c2c2c;
+  transition: color 0.3s ease;
+}
+
+.footer-links a:hover {
+  color: #000;
+}
