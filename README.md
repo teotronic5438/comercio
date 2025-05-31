@@ -20,7 +20,7 @@ En Linux/macOS:
 
 ✅ Desactivarlo
 
-    .\venv\Scripts\deactivate
+    deactivate
 
 ### 📦 2. Pip: congelar e instalar dependencias
 
