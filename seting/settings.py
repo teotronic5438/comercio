@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'apps.core',  # Asegúrate de que tu aplicación core esté registrada aquí
     'apps.stock',
+    'apps.ordenes'
 ]
 
 MIDDLEWARE = [
