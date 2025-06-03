@@ -114,6 +114,12 @@ Esto genera:
 
 ✅ Luego agregás 'apps.usuarios' o 'usuarios' (según tu estructura) a INSTALLED_APPS en settings.py.
 
+### 📦 8. Crear superusuario
+
+    python manage.py createsuperuser
+
+Seguir las indicaciones y guardar losd atos
+
 🧠 Resumen final:
 
     | Acción                                     | Comando                                        |
