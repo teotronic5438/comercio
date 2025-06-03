@@ -19,7 +19,7 @@ def dashboard(request):
     if 'usuario' not in request.session:
         return redirect('Login')  # si no hay usuario en sesión, lo redirigimos al login
 
-    return render(request, 'core/dashboard.html', {'show_navbar': True})
+    return render(request, 'dashboard.html', {'show_navbar': True})
 
 def logout(request):
     request.session.flush()  # eliminamos todos los datos de la sesión

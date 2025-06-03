@@ -13,12 +13,12 @@
 <body class="d-flex flex-column min-vh-100">
 
     <!-- HEADER FIJO -->
-    {% include 'core/header.html' %}
+    {% include 'includes/header.html' %}
 
     <!-- CONTENIDO CENTRAL -->
     <div class="d-flex flex-grow-1">
         <!-- SIDEBAR si corresponde -->
-        {% include 'core/navbar.html' %}
+        {% include 'includes/navbar.html' %}
 
         <!-- MAIN con scroll si hay mucho contenido -->
         <main class="flex-grow-1 p-3 overflow-auto">
@@ -33,7 +33,7 @@
     </div>
 
     <!-- FOOTER FIJO AL FINAL -->
-    {% include 'core/footer.html' %}
+    {% include 'includes/footer.html' %}
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="{% static 'js/script.js' %}"></script>
 </body>
