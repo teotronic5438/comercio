@@ -1,0 +1,11 @@
+<h1>Lista de Remitos</h1>
+<a href="{% url 'crear_remito' %}">Nuevo Remito</a>
+<ul>
+  {% for remito in remitos %}
+    <li>
+      {{ remito.numero_remito }} - ${{ producto.numero_viaje }}
+      [<a href="{% url 'editar_remito' remito.pk %}">Editar</a>]
+      [<a href="{% url 'eliminar_remito' remito.pk %}">Eliminar</a>]
+    </li>
+  {% endfor %}
+</ul>
