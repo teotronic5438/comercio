@@ -7,3 +7,9 @@ class Stock(models.Model):
     
     def __str__(self):
         return f'{self.nombre} - precio {self.precio}'
+    
+class Deposito(models.Model):
+    nombre = models.CharField(max_length=50)
+
+    def __str__(self):
+        return f'nombre de deposito: {self.nombre}'
