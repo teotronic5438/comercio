@@ -1,9 +1,9 @@
 from django import forms
-from .models import Remito, Producto, RemitoProducto
+from .models import Remitos
 
 class RemitoForm(forms.ModelForm):
     class Meta:
-        model = Remito
+        model = Remitos
         fields = ['numero_remito', 'numero_viaje', 'detalle_transporte', 'deposito_id', 'fecha_ingreso', 'usuario_id', 'aprobado']
         
                 

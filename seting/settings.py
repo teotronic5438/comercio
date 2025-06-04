@@ -42,7 +42,7 @@ INSTALLED_APPS = [
     'apps.stock',
     'apps.ordenes',
     'apps.usuarios',  # Asegúrate de que tu aplicación usuarios esté registrada aquí
-    'apps.ingresos',  # Asegúrate de que tu aplicación ingresos esté registrada aquí
+    'apps.ingresos'  # Asegúrate de que tu aplicación ingresos esté registrada aquí
 ]
 
 MIDDLEWARE = [

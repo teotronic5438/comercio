@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+
+{% block title %}Remitos{% endblock %}
+
+{% block content %}
+<h2>Formulario de Remito</h2>
+<form method="post">
+  {% csrf_token %}
+  {{ form.as_p }}
+  <button type="submit">Guardar</button>
+</form>
+<a href="{% url 'ingresos' %}">Cancelar</a>
+{% endblock %}

@@ -18,7 +18,7 @@ class Remitos(models.Model):
     deposito_id = models.ForeignKey('stock.Depositos', on_delete=models.PROTECT)
     fecha_ingreso = models.DateTimeField()
     usuario_id = models.ForeignKey('usuarios.Usuarios', on_delete=models.PROTECT)
-    aprobado = models.BooleanField(False)
+    aprobado = models.BooleanField()
     
     def __str__(self):
         return f"{self.numero_remito}"
@@ -26,8 +26,8 @@ class Remitos(models.Model):
 
 class RemitoProducto(models.Model):
     id = models.AutoField(primary_key=True)
-    remito_id = models.ForeignKey('ingresos.Remitos', on_delete=models.PROTECT)
-    producto_id = models.ForeignKey('ingresos.Productos', on_delete=models.PROTECT)
+    remito_id = models.ForeignKey('Remitos', on_delete=models.PROTECT)
+    producto_id = models.ForeignKey('Productos', on_delete=models.PROTECT)
     cantidad = models.IntegerField()
     actualizado = models.DateTimeField()
     
