@@ -6,10 +6,13 @@
 <h2>Lista de Remitos</h2>
     
 <a href="{% url 'crear_remito' %}">Nuevo Remito</a>
+
+<h6>Nro. remito - nro. viaje - detalle de transporte - Depósito Id - Fecha de ingreso - Usuario - Aprobado</h6>
+
 <ul>
   {% for remito in remitos %}
     <li>
-      {{ remito.numero_remito }} - ${{ producto.numero_viaje }}
+      {{ remito.numero_remito }} - {{ remito.numero_viaje }} - {{ remito.detalle_transporte }} - {{ remito.deposito_id }} - {{ remito.fecha_ingreso }} - {{ remito.usuario_id }} - {{ remito.aprobado }}
       [<a href="{% url 'editar_remito' remito.pk %}">Editar</a>]
       [<a href="{% url 'eliminar_remito' remito.pk %}">Eliminar</a>]
     </li>
