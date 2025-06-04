@@ -8,11 +8,11 @@
 
 
 from django.urls import path
-from . import views
+from .views import listar_remitos, crear_remito, editar_remito, eliminar_remito
 
 urlpatterns = [
-    path('', views.listar_remitos, name='listar_remitos'),
-    path('nuevo/', views.crear_remito, name='crear_remito'),
-    path('editar/<int:pk>/', views.editar_remito, name='editar_remito'),
-    path('eliminar/<int:pk>/', views.eliminar_remito, name='eliminar_remito'),
+    path('ingresos/', listar_remitos, name='ingresos'),
+    path('nuevo/', crear_remito, name='crear_remito'),
+    path('editar/<int:pk>/', editar_remito, name='editar_remito'),
+    path('eliminar/<int:pk>/', eliminar_remito, name='eliminar_remito'),
 ]
