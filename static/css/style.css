@@ -1,26 +1,30 @@
 /*********************
     HEADER
 *********************/
-.header-logo{
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    background: rgb(200, 201, 203); /* color fundido con el logo - VER*/
+.header-logo {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  background: rgb(200, 201, 203); /* color fundido con el logo - VER*/
 }
-.img-logo{
-    width: 50px;
-    height: 50px;
-    margin-right: 10px;
-    -webkit-mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 1), rgba(0, 0, 0, 0));
-    mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 1), rgba(0, 0, 0, 0));
+.img-logo {
+  width: 50px;
+  height: 50px;
+  margin-right: 10px;
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 1),
+    rgba(0, 0, 0, 0)
+  );
+  mask-image: linear-gradient(to bottom, rgba(0, 0, 0, 1), rgba(0, 0, 0, 0));
 }
-.titulo-logo{
-    text-align: start;
+.titulo-logo {
+  text-align: start;
 }
-.login-container a{
+.login-container a {
   text-decoration: none;
 }
-.login-container a:hover{
+.login-container a:hover {
   color: #e02626;
 }
 
@@ -28,8 +32,8 @@
     MENU DASHBOARD
 *********************/
 #sidebar {
-    min-height: 100vh;
-    transition: all 0.3s;
+  min-height: 100vh;
+  transition: all 0.3s;
 }
 #sidebar.collapsed {
   width: 0 !important;
@@ -42,16 +46,16 @@
   transition: all 0.3s ease;
 }
 #sidebar .nav-link {
-    transition: all 0.3s ease;
-    padding: 10px 15px;
-    border-left: 3px solid transparent;
+  transition: all 0.3s ease;
+  padding: 10px 15px;
+  border-left: 3px solid transparent;
 }
 
 #sidebar .nav-link:hover {
-    background-color: #495057; /* más claro que bg-secondary */
-    color: #ffc107 !important; /* color destacado: amarillo */
-    border-left: 3px solid #ffc107;
-    font-weight: bold;
+  background-color: #495057; /* más claro que bg-secondary */
+  color: #ffc107 !important; /* color destacado: amarillo */
+  border-left: 3px solid #ffc107;
+  font-weight: bold;
 }
 
 /*********************
@@ -80,4 +84,21 @@
 
 .footer-links a:hover {
   color: #000;
+}
+
+.ingresos-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px auto; /* center table itself */
+  border: 1px solid black;
+  text-align: center;
+}
+
+.ingresos-table th, .ingresos-table td {
+  border: 1px solid gray;
+  padding: 2px;
+  text-align: center; /* 👈 center-align content */
+}
+.ingresos-table th {
+  background-color: #f2f2f2;
 }
