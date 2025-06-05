@@ -68,6 +68,9 @@
                 <td>{{ remito.aprobado }}</td>
                 <td>[<a href="{% url 'editar_remito' remito.pk %}">Editar</a>]
                 [<a href="{% url 'eliminar_remito' remito.pk %}">Eliminar</a>]
+                {% if not remito.aprobado %}
+                [<a href="{% url 'aprobar_remito' remito.pk %}">Aprobar</a>]
+                {% endif %}
                 </td>
             </tr>
             {% empty %}

@@ -28,6 +28,17 @@ def editar_remito(request, pk):
         form = RemitoForm(instance=remito)
     return render(request, 'formulario.html', {'form': form})
 
+def aprobar_remito(request, pk):
+    remito = get_object_or_404(Remitos, pk=pk)
+    
+    if remito.aprobado == False:
+        remito.aprobado = True
+        remito.save()
+        return redirect('ingresos')
+    else:
+        return redirect('ingresos')
+
+
 def eliminar_remito(request, pk):
     remito = get_object_or_404(Remitos, pk=pk)
     if request.method == 'POST':
