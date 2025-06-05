@@ -1,9 +1,10 @@
 <div id="sidebar" class="bg-secondary text-white p-3" style="width: 200px">
   <h5>Menú</h5>
   <ul class="nav flex-column">
+    <!-- INGRESOS -->
     <li class="nav-item">
       <a
-        class="nav-link text-white"
+        class="nav-link text-white d-flex justify-content-between align-items-center"
         data-bs-toggle="collapse"
         href="#submenuIngresos"
         role="button"
@@ -11,40 +12,55 @@
         aria-controls="submenuIngresos"
       >
         Ingresos
+        <span class="ms-auto">&#9662;</span> <!-- flechita ▼ -->
       </a>
       <ul class="collapse list-unstyled ps-3" id="submenuIngresos">
         <li>
-          <a class="nav-link text-white" href="{% url 'ingresos' %}"
-            >Ingresos</a
-          >
+          <a class="nav-link text-white" href="{% url 'ingresos' %}">Ingresos</a>
         </li>
         <li>
-          <a class="nav-link text-white" href="{% url 'ingresos_historial' %}"
-            >Historial de Ingresos</a
-          >
+          <a class="nav-link text-white" href="{% url 'ingresos_historial' %}">Historial de Ingresos</a>
         </li>
       </ul>
     </li>
 
+    <!-- STOCK -->
     <li class="nav-item">
       <a class="nav-link text-white" href="{% url 'stock' %}">Stock</a>
     </li>
+
+    <!-- ORDENES -->
     <li class="nav-item">
       <a class="nav-link text-white" href="#">Ordenes</a>
     </li>
+
+    <!-- REVISADOS -->
     <li class="nav-item">
       <a class="nav-link text-white" href="#">Revisados</a>
     </li>
 
-    <li class="nav-item dropdown">
-      <a class="nav-link dropdown-toggle text-white" href="#" role="button" data-bs-toggle="dropdown">Despachos</a>
-      <ul class="dropdown-menu">
-        <li><a class="dropdown-item" href="#">Revisados</a></li>
-        <li><a class="dropdown-item" href="#">Nuevos</a></li>
-        <li><a class="dropdown-item" href="#">Averías</a></li>
-        <li><a class="dropdown-item" href="#">Destrucción</a></li>
+    <!-- DESPACHOS -->
+    <li class="nav-item">
+      <a
+        class="nav-link text-white d-flex justify-content-between align-items-center"
+        data-bs-toggle="collapse"
+        href="#submenuDespachos"
+        role="button"
+        aria-expanded="false"
+        aria-controls="submenuDespachos"
+      >
+        Despachos
+        <span class="ms-auto">&#9662;</span> <!-- flechita ▼ -->
+      </a>
+      <ul class="collapse list-unstyled ps-3" id="submenuDespachos">
+        <li><a class="nav-link text-white" href="#">Revisados</a></li>
+        <li><a class="nav-link text-white" href="#">Nuevos</a></li>
+        <li><a class="nav-link text-white" href="#">Averías</a></li>
+        <li><a class="nav-link text-white" href="#">Destrucción</a></li>
       </ul>
     </li>
+
+    <!-- REPORTES -->
     <li class="nav-item">
       <a class="nav-link text-white" href="#">Reportes</a>
     </li>
