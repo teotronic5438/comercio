@@ -1,6 +1,28 @@
-# Proyecto Enigma - Version X
+# 🧠 Enigma ERP - Backend
 
-## Prueba de versiones y modelado
+Este es el backend del sistema Enigma, un ERP modular desarrollado con Django y Django REST Framework. Gestiona productos, equipos, remitos, órdenes de reparación, logística y stock.
+
+## Estructura del Proyecto
+
+    comercio/
+    │
+    ├── manage.py # Script principal para administrar el proyecto
+    │
+    ├── seting/ # Configuración principal de Django (settings, urls, wsgi)
+    │ ├── init.py
+    │ ├── settings.py
+    │ ├── urls.py
+    │ └── wsgi.py
+    │
+    ├── apps/ # Contiene las aplicaciones divididas por etapas
+    │ ├── core/ # Funcionalidades base o comunes
+    │ ├── usuarios/ # Etapa 1: Roles y usuarios
+    │ ├── ingresos/ # Etapa 2: Remitos y productos ingresados
+    │ ├── stock/ # Etapa 3: Stock de productos
+    │ ├── ordenes/ # Etapa 4: Órdenes, estados y equipos
+    │ └── despachos/ # Etapa 5: Pallets y DetallePallets
+    │
+    └── requirements.txt # Dependencias del proyecto
 
 ### 🔧 1. Entorno Virtual
 
