@@ -4,8 +4,12 @@ from .models import Remitos
 from .forms import RemitoForm
 
 def listar_remitos(request):
-    remitos = Remitos.objects.all()
+    remitos = Remitos.objects.filter(aprobado=False)
     return render(request, 'listar.html', {'remitos': remitos})
+
+def listar_remitos_hitorial(request):
+    remitos = Remitos.objects.filter(aprobado=True)
+    return render(request, 'listar_historial.html', {'remitos': remitos})
 
 def crear_remito(request):
     if request.method == 'POST':
