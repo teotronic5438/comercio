@@ -1,3 +1,25 @@
+<html>
+<head>
+  <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px auto; /* center table itself */
+            border: 1px solid black;
+            text-align: center;
+        }
+
+        th, td {
+            border: 1px solid gray;
+            padding: 2px;
+            text-align: center; /* 👈 center-align content */
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
 {% extends "base.html" %}
 
 {% block title %}Remitos{% endblock %}
@@ -7,7 +29,7 @@
     
 <a href="{% url 'crear_remito' %}">Nuevo Remito</a>
 
-<h6>Nro. remito - nro. viaje - detalle de transporte - Depósito Id - Fecha de ingreso - Usuario - Aprobado</h6>
+<!-- <h6>Nro. remito - nro. viaje - detalle de transporte - Depósito Id - Fecha de ingreso - Usuario - Aprobado</h6>
 
 <ul>
   {% for remito in remitos %}
@@ -17,7 +39,46 @@
       [<a href="{% url 'eliminar_remito' remito.pk %}">Eliminar</a>]
     </li>
   {% endfor %}
-</ul>
+</ul> -->
+
+<table>
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Número Remito</th>
+                <th>Número viaje</th>
+                <th>Detalle de transporte</th>
+                <th>Depósito</th>
+                <th>Fecha de ingreso</th>
+                <th>Usuario</th>
+                <th>Aprobado</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for remito in remitos %}
+            <tr>
+                <td>{{ forloop.counter }}</td> <!-- Shows 1, 2, 3, etc. -->
+                <td>{{ remito.numero_remito }}</td>
+                <td>{{ remito.numero_viaje }}</td>
+                <td>{{ remito.detalle_transporte }}</td>
+                <td>{{ remito.deposito_id }}</td>
+                <td>{{ remito.fecha_ingreso }}</td>
+                <td>{{ remito.usuario_id }}</td>
+                <td>{{ remito.aprobado }}</td>
+                <td>[<a href="{% url 'editar_remito' remito.pk %}">Editar</a>]
+                [<a href="{% url 'eliminar_remito' remito.pk %}">Eliminar</a>]
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="3">No data available.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
     
 {% endblock %}
 
+</body>
+</html>
