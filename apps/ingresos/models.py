@@ -16,7 +16,7 @@ class Remitos(models.Model):
     numero_viaje = models.IntegerField()
     detalle_transporte = models.CharField(max_length=30)
     deposito_id = models.ForeignKey('stock.Depositos', on_delete=models.PROTECT)
-    fecha_ingreso = models.DateTimeField()
+    fecha_ingreso = models.DateField()
     usuario_id = models.ForeignKey('usuarios.Usuarios', on_delete=models.PROTECT)
     aprobado = models.BooleanField()
     

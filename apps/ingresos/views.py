@@ -12,7 +12,7 @@ def crear_remito(request):
         form = RemitoForm(request.POST)
         if form.is_valid():
             form.save()
-            return redirect('listar_remitos')
+            return redirect('ingresos')
     else:
         form = RemitoForm()
     return render(request, 'formulario.html', {'form': form})
@@ -23,14 +23,25 @@ def editar_remito(request, pk):
         form = RemitoForm(request.POST, instance=remito)
         if form.is_valid():
             form.save()
-            return redirect('listar_remitos')
+            return redirect('ingresos')
     else:
         form = RemitoForm(instance=remito)
     return render(request, 'formulario.html', {'form': form})
+
+def aprobar_remito(request, pk):
+    remito = get_object_or_404(Remitos, pk=pk)
+    
+    if remito.aprobado == False:
+        remito.aprobado = True
+        remito.save()
+        return redirect('ingresos')
+    else:
+        return redirect('ingresos')
+
 
 def eliminar_remito(request, pk):
     remito = get_object_or_404(Remitos, pk=pk)
     if request.method == 'POST':
         remito.delete()
-        return redirect('listar_remitos')
+        return redirect('ingresos')
     return render(request, 'confirmar_eliminar.html', {'remito': remito})
