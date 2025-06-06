@@ -6,8 +6,8 @@
     </div>
     <div class="login-container d-flex flex-column align-items-center mx-3">
         {% if show_navbar %}
-        <p  class="m-0">Bienvenido, {{ request.session.usuario }}</p>
-        <p class="m-0"><a href="{% url 'Logout' %}">Cerrar sesión</a></p>
+            <p  class="m-0">Bienvenido, {{ request.session.usuario }}</p>
+            <p class="m-0"><a href="{% url 'Logout' %}">Cerrar sesión</a></p>
         {% endif %}
     </div>
 </header>
