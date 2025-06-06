@@ -46,7 +46,7 @@ Este es el backend del sistema Enigma, un ERP modular desarrollado con Django y 
 
 En Windows:
 
-    .\venv\Scripts\activate
+    .\env\Scripts\activate
 
 En Linux/macOS:
 
