@@ -5,9 +5,9 @@ from .models import Depositos
 def stock(request):
     productos = StockProductos.objects.all()
     # return HttpResponse("<h1>Stock</h1>")
-    return render(request, 'stock.html', {'productos': productos})
+    return render(request, 'stock.html', {'productos': productos, 'show_navbar': True})
 
 def stock_deposito(request):
     depositos = Depositos.objects.all()
     # return HttpResponse("<h1>Deposito</h1>")
-    return render(request, 'deposito.html', {'depositos': depositos})
+    return render(request, 'deposito.html', {'depositos': depositos, 'show_navbar': True})

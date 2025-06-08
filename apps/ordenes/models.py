@@ -36,12 +36,13 @@ class Ordenes(models.Model):
     estado_id = models.ForeignKey(Estados, on_delete=models.CASCADE)
     falla_detectada = models.CharField(max_length=50)
     reparacion = models.CharField(max_length=50)
-    fecha_revision = models.DateTimeField()
+    fecha_revision = models.DateTimeField(auto_now_add=True)
     usuario_id = models.ForeignKey('usuarios.Usuarios', on_delete=models.CASCADE)
-    orden_activa = models.BooleanField()
-    fecha_creacion = models.DateTimeField()
+    orden_activa = models.BooleanField(default=True)
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
     modificacion_id = models.ForeignKey(HistorialOrdenes, on_delete=models.CASCADE, null=True, blank=True)
     destino = models.ForeignKey(Destinos, on_delete=models.CASCADE)
+    equipo_palletizado = models.BooleanField(default=False)
 
     def __str__(self):
         return f"Orden {self.id} - Modelo {self.equipo_id.numero_serie} - Estado {self.estado_id.nombre_estado}"
