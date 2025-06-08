@@ -1,4 +1,5 @@
 # Create your views here.
+# get_object_or_404: busca un objeto por clave primaria (PK); si no lo encuentra, devuelve error 404.
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Remitos
 from .forms import RemitoForm
