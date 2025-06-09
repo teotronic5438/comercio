@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4">Revisar Orden #{{ orden.id }}</h2>
+
+    <form method="post" class="needs-validation" novalidate>
+        {% csrf_token %}
+
+        <div class="mb-3 row">
+            <label class="col-sm-2 col-form-label fw-bold">Remito:</label>
+            <div class="col-sm-10 pt-2">
+                {{ orden.remito_id }}
+            </div>
+        </div>
+
+        <div class="mb-3 row">
+            <label class="col-sm-2 col-form-label fw-bold">Equipo:</label>
+            <div class="col-sm-10 pt-2">
+                {{ orden.equipo_id }}
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label for="falla_detectada" class="form-label fw-bold">Falla detectada</label>
+            <input type="text" class="form-control" id="falla_detectada" name="falla_detectada"
+                   placeholder="Ingrese la falla detectada" value="" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="reparacion" class="form-label fw-bold">Reparación</label>
+            <input type="text" class="form-control" id="reparacion" name="reparacion"
+                   placeholder="Ingrese la reparación realizada" value="" required>
+        </div>
+
+        <div class="mb-4">
+            <label for="destino" class="form-label fw-bold">Destino</label>
+            <select class="form-select" name="destino" id="destino" required>
+                {% for dest in destinos %}
+                    <option value="{{ dest.id }}" {% if dest == orden.destino %}selected{% endif %}>
+                        {{ dest.nombre_destino }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="text-end">
+            <button type="submit" class="btn btn-success">Guardar Cambios</button>
+        </div>
+    </form>
+</div>
+{% endblock %}
+

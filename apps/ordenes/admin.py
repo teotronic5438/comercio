@@ -18,7 +18,7 @@ class EquiposAdmin(admin.ModelAdmin):
     list_display = ['id', 'numero_serie', 'producto_id', 'fecha_alta']
     search_fields = ['numero_serie', 'producto_id']
 
-
+'''
 @admin.register(Ordenes)
 class OrdenesAdmin(admin.ModelAdmin):
     list_display = ['id', 'remito_id', 'get_equipo', 'get_estado', 'orden_activa', 'fecha_creacion']
@@ -32,7 +32,21 @@ class OrdenesAdmin(admin.ModelAdmin):
     @admin.display(description='Estado')
     def get_estado(self, obj):
         return obj.estado.nombre_estado
+'''
 
+from django import forms
+
+class OrdenesAdminForm(forms.ModelForm):
+    class Meta:
+        model = Ordenes
+        fields = ['remito_id', 'equipo_id']
+
+class OrdenesAdmin(admin.ModelAdmin):
+    form = OrdenesAdminForm
+    readonly_fields = ('fecha_creacion', 'fecha_revision')
+    list_display = ('id', 'equipo_id', 'estado_id', 'remito_id', 'orden_activa')
+
+admin.site.register(Ordenes, OrdenesAdmin)
 
 @admin.register(HistorialOrdenes)
 class HistorialOrdenesAdmin(admin.ModelAdmin):

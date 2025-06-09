@@ -8,7 +8,7 @@ class Productos(models.Model):
     modelo = models.CharField(max_length=50, unique=True)
 
     def __str__(self):
-        return f"{self.marca} {self.modelo}"
+        return f"{self.marca} - {self.modelo}"
 
 class Remitos(models.Model):
     id = models.AutoField(primary_key=True)
