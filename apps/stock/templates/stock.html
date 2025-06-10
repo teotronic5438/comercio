@@ -4,7 +4,48 @@
 {% block title %}Stock{% endblock %}
 
 {% block content %}
+<form method="get" style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-bottom: 1rem;">
+<input type="text" name="busqueda" placeholder="Cuadro De busqueda" value="{{ request.GET.busqueda }}">
+<select name="filtro" class="form-select w-auto">
+    <option value="">Filtro</option>
+    <option value="marca" {% if request.GET.filtro == "marca" %}selected{% endif %}>Marca</option>
+    <option value="modelo" {% if request.GET.filtro == "modelo" %}selected{% endif %}>Modelo</option>
+    <option value="deposito" {% if request.GET.filtro == "deposito" %}selected{% endif %}>Depósito</option>
+    <option value="ubicacion" {% if request.GET.filtro == "ubicacion" %}selected{% endif %}>Ubicación</option>
+    <option value="cantidad" {% if request.GET.filtro == "cantidad" %}selected{% endif %}>Cantidad</option>
+</select>
+<button type="submit">Buscar</button>
+<a href="{% url 'stock' %}">Limpiar</a>
+</form>
 
-    <h2>Bienvenido al sector stock</h2>
-    
+<table class="table table-bordered table-hover table-sm align-middle text-center w-100">
+<thead class="table-primary">
+    <tr>
+        <th>ID</th>
+        <th>Marca</th>
+        <th>Modelo</th>
+        <th>Depósito</th>
+        <th>Cantidad</th>
+        <th>Ubicación</th>
+        <th>Precio Unitario</th>
+    </tr>
+</thead>
+<tbody>
+    {% for producto in productos %}
+    <tr>
+        <td>{{ producto.id }}</td>
+        <td>{{ producto.producto_id.marca }}</td>
+        <td>{{ producto.producto_id.modelo }}</td>
+        <td>{{ producto.deposito_id.nombre }}</td>
+        <td>{{ producto.cantidad_total }}</td>
+        <td>{{ producto.ubicacion }}</td>
+        <td>${{ producto.precio_unitario }}</td>
+    </tr>
+    {% empty %}
+    <tr>
+        <td colspan="7">No se encontraron productos</td>
+    </tr>
+    {% endfor %}
+</tbody>
+</table>
 {% endblock %}
