@@ -105,3 +105,33 @@ def eliminar_remito(request, pk):
         remito.delete()
         return redirect('ingresos')
     return render(request, 'remitos/confirmar_eliminar.html', {'remito': remito, 'show_navbar': True})
+
+
+
+# vistas para apis
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import AllowAny
+from rest_framework.response import Response
+from .serializers import RemitoSerializer
+
+@api_view(['GET'])
+@permission_classes([AllowAny])  # <--- esta línea es clave
+def remito_list(request):
+    remitos = Remitos.objects.all()
+    serializer = RemitoSerializer(remitos, many=True)
+    return Response(serializer.data)
+
+
+from rest_framework import status
+
+@api_view(['POST'])
+@permission_classes([AllowAny])  # Cambiar a IsAuthenticated si tenés autenticación activa
+def remito_create(request):
+    """
+    Crea un nuevo remito con los datos básicos.
+    """
+    serializer = RemitoSerializer(data=request.data)
+    if serializer.is_valid():
+        serializer.save()
+        return Response({"mensaje": "Remito creado correctamente", "remito": serializer.data}, status=status.HTTP_201_CREATED)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

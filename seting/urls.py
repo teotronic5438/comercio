@@ -25,4 +25,5 @@ urlpatterns = [
     path('ingresos/history', include('apps.ingresos.urls')),
     path("", include('apps.ordenes.urls')),
     path('despachos/', include('apps.despachos.urls')),
+    path('api/ingresos/', include('apps.ingresos.urls')),
 ]
