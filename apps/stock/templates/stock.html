@@ -14,8 +14,8 @@
     <option value="ubicacion" {% if request.GET.filtro == "ubicacion" %}selected{% endif %}>Ubicación</option>
     <option value="cantidad" {% if request.GET.filtro == "cantidad" %}selected{% endif %}>Cantidad</option>
 </select>
-<button type="submit">Buscar</button>
-<a href="{% url 'stock' %}">Limpiar</a>
+<button class="btn btn-info" type="submit">Buscar</button>
+<a class="btn btn-secondary" href="{% url 'stock' %}">Limpiar</a>
 </form>
 
 <table class="table table-bordered table-hover table-sm align-middle text-center w-100">
