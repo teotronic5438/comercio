@@ -2,36 +2,91 @@
 # get_object_or_404: busca un objeto por clave primaria (PK); si no lo encuentra, devuelve error 404.
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Remitos
-from .forms import RemitoForm
+from .forms import RemitoForm, RemitoProductoFormSet
+
+
 
 def listar_remitos(request):
     remitos = Remitos.objects.filter(aprobado=False)
-    return render(request, 'listar.html', {'remitos': remitos, 'show_navbar': True})
+    return render(request, 'remitos/listar.html', {'remitos': remitos, 'show_navbar': True})
 
 def listar_remitos_hitorial(request):
     remitos = Remitos.objects.filter(aprobado=True)
-    return render(request, 'listar_historial.html', {'remitos': remitos, 'show_navbar': True})
+    return render(request, 'remitos/listar_historial.html', {'remitos': remitos, 'show_navbar': True})
 
 def crear_remito(request):
     if request.method == 'POST':
         form = RemitoForm(request.POST)
-        if form.is_valid():
-            form.save()
+        formset = RemitoProductoFormSet(request.POST)
+        if form.is_valid() and formset.is_valid():
+            remito = form.save()
+            formset.instance = remito
+            formset.save()
             return redirect('ingresos')
     else:
         form = RemitoForm()
-    return render(request, 'formulario.html', {'form': form, 'show_navbar': True})
+        formset = RemitoProductoFormSet()
+    return render(request, 'remitos/formulario.html', {'form': form, 'formset': formset})
+
 
 def editar_remito(request, pk):
     remito = get_object_or_404(Remitos, pk=pk)
+
     if request.method == 'POST':
+        print("POST recibido")
         form = RemitoForm(request.POST, instance=remito)
-        if form.is_valid():
+        formset = RemitoProductoFormSet(request.POST, instance=remito)
+
+        if form.is_valid() and formset.is_valid():
+            print("Formularios válidos. Guardando...")
             form.save()
+            formset.save()
             return redirect('ingresos')
+        else:
+            print("Formularios inválidos")
+            print("Errores form:", form.errors)
+            print("Errores formset:", formset.errors)
     else:
         form = RemitoForm(instance=remito)
-    return render(request, 'formulario.html', {'form': form, 'show_navbar': True})
+        formset = RemitoProductoFormSet(instance=remito)
+
+    return render(request, 'remitos/formulario.html', {'form': form, 'formset': formset})
+# Aplica las mismas líneas de depuración a la función editar_remito
+
+# def crear_remito(request):
+#     if request.method == 'POST':
+#         form = RemitoForm(request.POST)
+#         # Inicializamos el formset con los datos POST y una instancia vacía de Remitos
+#         formset = RemitoProductoFormSet(request.POST, instance=Remitos())
+
+#         if form.is_valid() and formset.is_valid():
+#             remito = form.save(commit=False) # No guardar aún, para asignar campos adicionales
+
+#             # # Asignar el usuario actual si está logueado
+#             # # Es crucial que el usuario esté autenticado para que request.user sea válido
+#             # if request.user.is_authenticated:
+#             #     remito.usuario_id = request.user
+#             # else:
+#             #     # Manejar caso de usuario no autenticado, quizás redirigir a login o asignar un usuario por defecto
+#             #     # Por ahora, lanzar un error o redirigir si el campo es obligatorio
+#             #     # raise Exception("Usuario no autenticado, no se puede crear el remito.")
+#             #     return redirect('login') # O tu URL de login
+
+#             remito.aprobado = False # Por defecto, un remito nuevo no está aprobado
+#             remito.save() # Ahora sí guardamos el Remito
+
+#             formset.instance = remito # Asociar el formset con el remito recién creado
+#             formset.save() # Guardar los productos asociados al remito
+            
+
+#             return redirect('ingresos') # Redirigir a la lista de remitos no aprobados
+#     else:
+#         form = RemitoForm()
+#         formset = RemitoProductoFormSet(instance=Remitos()) # Instancia vacía para el formset inicial
+    
+#     # Asegúrate de que el template formulario.html esté preparado para renderizar el formset
+#     return render(request, 'remitos/formulario.html', {'form': form, 'formset': formset, 'show_navbar': True})
+
 
 def aprobar_remito(request, pk):
     remito = get_object_or_404(Remitos, pk=pk)
@@ -49,4 +104,4 @@ def eliminar_remito(request, pk):
     if request.method == 'POST':
         remito.delete()
         return redirect('ingresos')
-    return render(request, 'confirmar_eliminar.html', {'remito': remito, 'show_navbar': True})
+    return render(request, 'remitos/confirmar_eliminar.html', {'remito': remito, 'show_navbar': True})

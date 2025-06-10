@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block title %}Remitos{% endblock %}
+
+{% block content %}
+<h2>Formulario de Remito</h2>
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    {{ formset.management_form }}
+
+    <table id="productosTable">
+        <thead>
+            <tr>
+                <th>Producto</th>
+                <th>Cantidad</th>
+                <th>Eliminar</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for form in formset %}
+                <tr class="producto-form">
+                    <td>{{ form.producto_id }}{{ form.id }}</td>
+                    <td>{{ form.cantidad }}</td>
+                    <td>
+                        {% if form.instance.pk %}
+                            {{ form.DELETE }}
+                        {% else %}
+                           <button type="button" class="remove-row">Eliminar</button>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <button type="button" id="addRow">Agregar Producto</button>
+    <button type="submit">Guardar</button>
+</form>
+{% endblock %}
