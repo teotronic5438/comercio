@@ -23,5 +23,6 @@ urlpatterns = [
     path('', include('apps.stock.urls')),
     path('ingresos/', include('apps.ingresos.urls')),
     path('ingresos/history', include('apps.ingresos.urls')),
-    path("", include('apps.ordenes.urls'))
+    path("", include('apps.ordenes.urls')),
+    path('despachos/', include('apps.despachos.urls')),
 ]
