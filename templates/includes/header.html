@@ -2,12 +2,29 @@
 <header class="header-logo">
     <div class="logo-container d-flex">
         <img class="img-logo" src="{% static 'img/enigma_img.jpg' %}" alt="LOGO DE RUBIC ENIGMA">
-        <h1 class="titulo-logo">ENIGMA</h1>
+        <h1 class="titulo-logo">ENIGMA</h1>           
     </div>
+
+     <div class="">
+            <a href="{% url 'core:home' %}"> Home</a>
+            {% if user.is_authenticated %}
+                Hello, {{ user.username }} , (rol) {{ user.rol }} 
+                <form action=" {% url 'usuarios:logout' %}" method='post'>
+                    {% csrf_token %}
+                <span> <button name='submit' class='btn btn-outline-secondary btn-sm'> >Log out</button></span>
+        </form>
+            {% else %}
+                <a href="{% url 'usuarios:register' %}"> Regitrarse </a>
+                <a href="{% url 'usuarios:login' %}"> Login </a>
+            {% endif %}
+           
+    </div>
+
     <div class="login-container d-flex flex-column align-items-center mx-3">
         {% if show_navbar %}
-            <p  class="m-0">Bienvenido, {{ request.session.usuario }}</p>
-            <p class="m-0"><a href="{% url 'Logout' %}">Cerrar sesión</a></p>
+            
         {% endif %}
+       
     </div>
 </header>
+

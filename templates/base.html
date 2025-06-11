@@ -17,8 +17,9 @@
     <!-- CONTENIDO CENTRAL -->
     <div class="d-flex flex-grow-1">
         <!-- SIDEBAR si corresponde -->
-        {% include 'includes/navbar.html' %}
-
+        {% if user.is_authenticated %}
+            {% include 'includes/navbar.html' %}
+        {% endif %}
         <!-- MAIN con scroll si hay mucho contenido -->
         <main class="flex-grow-1 p-3 overflow-auto">
             <button class="btn btn-outline-primary mb-3" onclick="toggleSidebar()">☰</button>

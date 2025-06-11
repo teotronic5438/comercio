@@ -3,6 +3,13 @@ from .models import Usuarios, Roles
 
 # Register your models here.
 # admin.site.register(Usuarios)
+
+# Register your models here.
+admin.site.register(Usuarios)
+admin.site.register(Roles)
+
+
+"""
 @admin.register(Usuarios)
 class UsuariosAdmin(admin.ModelAdmin):
     list_display = ('id', 'nombre', 'apellido', 'nombre_usuario', 'rol', 'activo')
@@ -16,3 +23,5 @@ class RolesAdmin(admin.ModelAdmin):
     list_display = ('id', 'nombre')
     search_fields = ('nombre',)
     list_filter = ('nombre',)
+
+"""
