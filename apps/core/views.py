@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect
 
+""" 
 def login(request):
     error = None
     if request.method == 'POST':
@@ -14,6 +15,7 @@ def login(request):
             error = 'Usuario o contraseña incorrectos'
 
     return render(request, 'core/login.html', {'show_navbar': False, 'error': error})
+""" 
 
 def dashboard(request):
     if 'usuario' not in request.session:
@@ -21,6 +23,12 @@ def dashboard(request):
 
     return render(request, 'dashboard.html', {'show_navbar': True})
 
-def logout(request):
-    request.session.flush()  # eliminamos todos los datos de la sesión
-    return redirect('Login')
+
+#def logout(request):  ESTO SE HAcE DESDE USUARIOS 
+ #   request.session.flush()  # eliminamos todos los datos de la sesión
+  #  return redirect('Login')
+
+def home(request):
+    return render(request, 'core/home.html')
+
+ 

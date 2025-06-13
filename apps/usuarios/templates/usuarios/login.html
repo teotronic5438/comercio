@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+
+
+{% block content %}
+
+    {% if form.errors  %}
+        <p> datos incorrectos </p>
+    {% endif %}
+
+
+  <form class="" action="{% url 'usuarios:login' %}" method="post">
+        {% csrf_token %}
+			{{ form.as_p }}
+
+				{% for field in form %}
+				<p>
+				{% for error in field.errors %}
+				<p style="color: red">{{ error }}</p>
+				{% endfor %}
+				</p>
+				{% endfor %}
+				{% if form.non_field_errors %}
+				<div style="color: red">
+				<p>{{ form.non_field_errors }}</p>
+				</div>
+
+				{% endif %}
+
+       
+        <button class="btn btn-lg btn-primary btn-block" name="submit"> Log In</button>
+		<a href="{% url 'core:home' %}" class="btn btn-lg btn-danger btn-block" type="submit">Cancelar</a>
+    </form>
+
+{% endblock %}

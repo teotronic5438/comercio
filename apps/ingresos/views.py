@@ -51,6 +51,8 @@ def editar_remito(request, pk):
         formset = RemitoProductoFormSet(instance=remito)
 
     return render(request, 'remitos/formulario.html', {'form': form, 'formset': formset})
+
+
 # Aplica las mismas líneas de depuración a la función editar_remito
 
 # def crear_remito(request):
