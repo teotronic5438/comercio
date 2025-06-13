@@ -1,20 +1,6 @@
 from django.shortcuts import render,HttpResponse
 from .models import StockProductos
 
-# from .models import Depositos
-
-# Create your views here.
-
-# def stock(request):
-#     productos = StockProductos.objects.all()
-#     # return HttpResponse("<h1>Stock</h1>")
-#     return render(request, 'stock.html', {'productos': productos, 'show_navbar': True})
-
-# def stock_deposito(request):
-#     depositos = Depositos.objects.all()
-#     # return HttpResponse("<h1>Deposito</h1>")
-#     return render(request, 'deposito.html', {'depositos': depositos, 'show_navbar': True})
-
 def stock(request):
     productos = StockProductos.objects.select_related('producto_id', 'deposito_id').all()
 
@@ -35,7 +21,7 @@ def stock(request):
                 cantidad = int(busqueda)
                 productos = productos.filter(cantidad_total=cantidad)
             except ValueError:
-                productos = productos.none()  # si no es un número, no mostramos nada
+                productos = productos.none() 
 
     return render(request, 'stock.html', {
         'productos': productos,
