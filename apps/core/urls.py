@@ -9,5 +9,5 @@ urlpatterns = [
    # path('', login, name='Login'),
     path('dashboard/', dashboard, name='Dashboard'),
     #path('logout/', logout, name='Logout'), BORRADO xq se accede desde usuarios:logout
-    path('home/', home, name ='home'),
+    path('', home, name ='home'),
 ]

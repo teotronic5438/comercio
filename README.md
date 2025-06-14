@@ -34,7 +34,32 @@ Este es el backend del sistema Enigma, un ERP modular desarrollado con Django y 
     │
     └── requirements.txt # Dependencias del proyecto
 
-    
+
+### 🔧 0. PRUEBA CON AUTENTICACION
+
+Primero debemos borrar todas las migraciones hechas
+
+    rm usuarios/migrations/.py
+    rm ingresos/migrations/.py
+    rm ordenes/migrations/.py
+    rm stock/migrations/.py
+    rm despachos/migrations/.py
+
+Segundo: Primera migracion debe ser usuarios
+
+    python manage.py makemigrations usuarios    # devuelve la creacion de tabla usuarios y roles
+
+Tercero: Resto de  migraciones
+
+    python manage.py makemigrations     # devuelve la creacion de las otras tablas.
+
+Cuarto: Aplicamos migrate
+
+    python manage.py migrate
+
+Cinco: Si no esta, debe tener las bases de datos.
+
+Verificar que este copiada la base
 
 ### 🔧 1. Entorno Virtual
 
