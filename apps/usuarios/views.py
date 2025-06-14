@@ -16,7 +16,7 @@ from .models import Usuarios
 
 def logoutUsuario(request):
      logout(request)
-     return HttpResponseRedirect('/login/')  #ex: return HttpResponseRedirect('usuarios:login')
+     return HttpResponseRedirect('/usuarios/login/')  #ex: return HttpResponseRedirect('usuarios:login')
 
 
 def login_view(request):

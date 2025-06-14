@@ -8,13 +8,13 @@
      <div class="">
             <a href="{% url 'core:home' %}"> Home</a>
             {% if user.is_authenticated %}
-                Hello, {{ user.username }} , (rol) {{ user.rol }} 
+                Hola, {{ user.username }} , (rol) {{ user.rol }} 
                 <form action=" {% url 'usuarios:logout' %}" method='post'>
                     {% csrf_token %}
                 <span> <button name='submit' class='btn btn-outline-secondary btn-sm'> >Log out</button></span>
         </form>
             {% else %}
-                <a href="{% url 'usuarios:register' %}"> Regitrarse </a>
+                <a href="{% url 'usuarios:register' %}"> Registrarse </a>
                 <a href="{% url 'usuarios:login' %}"> Login </a>
             {% endif %}
            
