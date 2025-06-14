@@ -22,7 +22,9 @@
         {% endif %}
         <!-- MAIN con scroll si hay mucho contenido -->
         <main class="flex-grow-1 p-3 overflow-auto">
-            <button class="btn btn-outline-primary mb-3" onclick="toggleSidebar()">☰</button>
+            {% if user.is_authenticated %}
+                <button class="btn btn-outline-primary mb-3" onclick="toggleSidebar()">☰</button>
+            {% endif %}
 
             {% block content %}
 

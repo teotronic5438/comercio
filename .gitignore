@@ -71,8 +71,8 @@ var/
 .pytest_cache/
 
 # Database files
-*.sqlite3
-*.db
+# *.sqlite3
+# *.db
 
 # Local environment variables
 .env
