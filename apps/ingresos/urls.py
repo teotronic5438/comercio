@@ -16,7 +16,7 @@ from .views import remito_list, remito_create
 
 urlpatterns = [
     path('ingresos/', listar_remitos, name='ingresos'),
-    path('ingresos/history', listar_remitos_hitorial, name='ingresos_historial'),
+    path('history/', listar_remitos_hitorial, name='ingresos_historial'),
     path('nuevo/', crear_remito, name='crear_remito'),
     path('editar/<int:pk>/', editar_remito, name='editar_remito'),
     path('eliminar/<int:pk>/', eliminar_remito, name='eliminar_remito'),
