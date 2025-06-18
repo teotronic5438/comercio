@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+
+{% block title %}Ordenes{% endblock %}
+
+{% block content %}
+    <h2>Órdenes activas (Total: {{ total_ordenes }})</h2>
+
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Modelo</th>
+                <th>Fecha creación</th>
+                <th>Tiempo transcurrido</th>
+                <th>Estado</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for orden in ordenes %}
+            <tr>
+                <td>{{ orden.id }}</td>
+                <td>{{ orden.modelo }}</td>
+                <td>{{ orden.fecha_creacion }}</td>
+                <td>{{ orden.tiempo_transcurrido }}</td>
+                <td>{{ orden.estado }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="pagination">
+        <span class="step-links">
+            {% if page_obj.has_previous %}
+                <a href="?page=1">&laquo; primera</a>
+                <a href="?page={{ page_obj.previous_page_number }}">anterior</a>
+            {% endif %}
+
+            <span class="current">
+                Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}.
+            </span>
+
+            {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}">siguiente</a>
+                <a href="?page={{ page_obj.paginator.num_pages }}">última &raquo;</a>
+            {% endif %}
+        </span>
+    </div>
+
+{% endblock %}

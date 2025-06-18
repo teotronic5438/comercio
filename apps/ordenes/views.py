@@ -8,6 +8,7 @@ from .models import Ordenes, Estados, Destinos
 from django.views.generic.edit import UpdateView
 from django.utils.timezone import now
 from django.urls import reverse_lazy
+from django.core.paginator import Paginator
 
 ''' # vista anterior en funcion 
 # Create your views here.
@@ -125,3 +126,35 @@ class RevisarOrdenUpdateView(UpdateView):
         orden.fecha_revision = now()
         
         return super().form_valid(form)
+    
+
+# creando solo ordenes activas de prueba
+class OrdenesActivasListView(ListView):
+    model = Ordenes
+    template_name = 'ordenes/ordenes_activas.html'
+    context_object_name = 'ordenes'
+    paginate_by = 10  # 🔹 Paginación: 10 por página
+
+    def get_queryset(self):
+        return Ordenes.objects.select_related(
+            'equipo_id__producto_id', 'estado_id'
+        ).filter(
+            orden_activa=True
+        ).order_by('-fecha_creacion')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        datos_ordenes = []
+
+        for orden in context['ordenes']:
+            datos_ordenes.append({
+                'id': orden.id,
+                'modelo': orden.equipo_id.producto_id.modelo,
+                'fecha_creacion': orden.fecha_creacion,
+                'tiempo_transcurrido': now() - orden.fecha_creacion,
+                'estado': orden.estado_id.nombre_estado,
+            })
+
+        context['ordenes'] = datos_ordenes
+        context['total_ordenes'] = self.get_queryset().count()  # 🔹 Total informativo
+        return context
