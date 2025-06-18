@@ -48,7 +48,9 @@ def crear_remito(request):
         form = RemitoForm(request.POST)
         formset = RemitoProductoFormSet(request.POST)
         if form.is_valid() and formset.is_valid():
-            remito = form.save()
+            remito = form.save(commit=False)
+            remito._request = request  # inyectamos el request para que setee el usuario
+            remito.save()
             formset.instance = remito
             formset.save()
             return redirect('ingresos')
@@ -56,6 +58,7 @@ def crear_remito(request):
         form = RemitoForm()
         formset = RemitoProductoFormSet()
     return render(request, 'remitos/formulario.html', {'form': form, 'formset': formset})
+
 
 
 def editar_remito(request, pk):

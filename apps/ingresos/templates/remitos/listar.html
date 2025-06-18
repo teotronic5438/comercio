@@ -2,7 +2,7 @@
 {% block content %}
 <h2>Lista de Remitos</h2>
     
-<a href="{% url 'crear_remito' %}">Nuevo Remito</a>
+<a class="btn btn-primary" href="{% url 'crear_remito' %}">Nuevo Remito</a>
 
 <table class="ingresos-table">
         <thead>
@@ -29,11 +29,12 @@
                 <td>{{ remito.fecha_ingreso }}</td>
                 <td>{{ remito.usuario_id }}</td>
                 <td>{{ remito.aprobado }}</td>
-                <td>[<a href="{% url 'editar_remito' remito.pk %}">Editar</a>]
-                [<a href="{% url 'eliminar_remito' remito.pk %}">Eliminar</a>]
-                {% if not remito.aprobado %}
-                [<a href="{% url 'aprobar_remito' remito.pk %}">Aprobar</a>]
-                {% endif %}
+                <td>
+                    <a href="{% url 'editar_remito' remito.pk %}"><span class="badge bg-warning mx-2">Editar</span></a>
+                    <a href="{% url 'eliminar_remito' remito.pk %}"><span class="badge bg-danger mx-2">Eliminar</span></a>
+                    {% if not remito.aprobado %}
+                        <a href="{% url 'aprobar_remito' remito.pk %}"><span class="badge bg-success mx-2">Aprobar</span></a>
+                    {% endif %}
                 </td>
             </tr>
             {% empty %}

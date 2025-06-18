@@ -26,15 +26,17 @@
                         {% if form.instance.pk %}
                             {{ form.DELETE }}
                         {% else %}
-                           <button type="button" class="remove-row">Eliminar</button>
+                           <button class="btn btn-danger" type="button" class="remove-row">Eliminar</button>
                         {% endif %}
                     </td>
                 </tr>
             {% endfor %}
         </tbody>
     </table>
+    <div class="my-2">
+        <button class="btn btn-primary" type="button" id="addRow">Agregar Producto</button>
+        <button class="btn btn-success" type="submit">Guardar</button>
+    </div>
 
-    <button type="button" id="addRow">Agregar Producto</button>
-    <button type="submit">Guardar</button>
 </form>
 {% endblock %}
