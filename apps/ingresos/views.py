@@ -3,16 +3,45 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Remitos
 from .forms import RemitoForm, RemitoProductoFormSet
+from django.views.generic import ListView
 
+# listado con clase
+class ListarRemitosView(ListView):
+    model = Remitos
+    template_name = 'remitos/listar.html'
+    context_object_name = 'remitos'
 
+    def get_queryset(self):
+        return Remitos.objects.filter(aprobado=False)
 
-def listar_remitos(request):
-    remitos = Remitos.objects.filter(aprobado=False)
-    return render(request, 'remitos/listar.html', {'remitos': remitos, 'show_navbar': True})
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['show_navbar'] = True
+        return context
 
-def listar_remitos_hitorial(request):
-    remitos = Remitos.objects.filter(aprobado=True)
-    return render(request, 'remitos/listar_historial.html', {'remitos': remitos, 'show_navbar': True})
+# listado con función    
+# def listar_remitos(request):
+#     remitos = Remitos.objects.filter(aprobado=False)
+#     return render(request, 'remitos/listar.html', {'remitos': remitos, 'show_navbar': True})
+
+# listado aprobado con clase
+class ListarRemitosHistorialView(ListView):
+    model = Remitos
+    template_name = 'remitos/listar_historial.html'
+    context_object_name = 'remitos'
+
+    def get_queryset(self):
+        return Remitos.objects.filter(aprobado=True)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['show_navbar'] = True
+        return context
+
+# listado aprobado con función
+# def listar_remitos_hitorial(request):
+#     remitos = Remitos.objects.filter(aprobado=True)
+#     return render(request, 'remitos/listar_historial.html', {'remitos': remitos, 'show_navbar': True})
 
 def crear_remito(request):
     if request.method == 'POST':
