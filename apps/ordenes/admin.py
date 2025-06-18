@@ -39,12 +39,20 @@ from django import forms
 class OrdenesAdminForm(forms.ModelForm):
     class Meta:
         model = Ordenes
-        fields = ['remito_id', 'equipo_id']
+        fields = ['remito_id', 'equipo_id', 'estado_id', 'falla_detectada', 'reparacion', 'fecha_revision', 'destino', 'orden_activa', 'equipo_palletizado']  # agrega los campos que quieras exponer
 
 class OrdenesAdmin(admin.ModelAdmin):
     form = OrdenesAdminForm
     readonly_fields = ('fecha_creacion', 'fecha_revision')
     list_display = ('id', 'equipo_id', 'estado_id', 'remito_id', 'orden_activa')
+
+    def save_model(self, request, obj, form, change):
+        # Asignar usuario creador si no tiene
+        if not obj.usuario_id:
+            obj.usuario = request.user
+        # Asignar quien edita siempre
+        obj.editado_por = request.user
+        super().save_model(request, obj, form, change)
 
 admin.site.register(Ordenes, OrdenesAdmin)
 

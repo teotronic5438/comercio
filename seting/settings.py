@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'apps.ingresos',  # Asegúrate de que tu aplicación ingresos esté registrada aquí
     'apps.despachos',
     'rest_framework',
+    'widget_tweaks',
 
 ]
 
