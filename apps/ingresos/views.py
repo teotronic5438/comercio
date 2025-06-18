@@ -1,9 +1,11 @@
 # Create your views here.
 # get_object_or_404: busca un objeto por clave primaria (PK); si no lo encuentra, devuelve error 404.
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import Remitos
+from .models import Remitos, RemitoProducto
+from apps.ordenes.models import Equipos, Ordenes, Estados
 from .forms import RemitoForm, RemitoProductoFormSet
 from django.views.generic import ListView
+from apps.stock.models import StockProductos, Depositos
 
 # listado con clase
 class ListarRemitosView(ListView):
@@ -121,7 +123,7 @@ def editar_remito(request, pk):
 #     # Asegúrate de que el template formulario.html esté preparado para renderizar el formset
 #     return render(request, 'remitos/formulario.html', {'form': form, 'formset': formset, 'show_navbar': True})
 
-
+''' reemplazando modelo de funcion para agregar ordenes
 def aprobar_remito(request, pk):
     remito = get_object_or_404(Remitos, pk=pk)
     
@@ -131,6 +133,57 @@ def aprobar_remito(request, pk):
         return redirect('ingresos')
     else:
         return redirect('ingresos')
+'''
+from apps.ordenes.models import get_estado_pendiente
+from django.db import transaction
+
+def aprobar_remito(request, pk):
+    remito = get_object_or_404(Remitos, pk=pk)
+
+    if remito.aprobado:
+        return redirect('ingresos')
+
+    with transaction.atomic():
+        remito.aprobado = True
+        remito.save()
+
+        estado_pendiente = Estados.objects.get(pk=get_estado_pendiente())
+        
+        remito_productos = RemitoProducto.objects.filter(remito_id=remito)
+
+        for rp in remito_productos:
+            producto = rp.producto_id
+            cantidad = rp.cantidad
+            ## nota
+            deposito = remito.deposito_id
+
+            # ACTUALIZAR STOCK
+            stock_producto, creado = StockProductos.objects.get_or_create(
+                producto_id=producto,
+                deposito_id=deposito,
+                defaults={'cantidad_total': 0}
+            )
+            stock_producto.cantidad_total += cantidad
+            stock_producto.save()
+
+            # Crear equipos y órdenes
+            for _ in range(cantidad):
+                equipo = Equipos.objects.create(
+                    producto_id=producto,
+                    observaciones=f"Generado por remito {remito.numero_remito}"
+                )
+
+                orden = Ordenes(
+                    remito_id=remito,
+                    equipo_id=equipo,
+                    estado_id=estado_pendiente,
+                    orden_activa=True,
+                )
+                orden._request = request  # Para que setee los usuarios en el `save()`
+                orden.save()
+
+    return redirect('ingresos')
+
 
 
 def eliminar_remito(request, pk):
