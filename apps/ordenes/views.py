@@ -9,6 +9,7 @@ from django.views.generic.edit import UpdateView
 from django.utils.timezone import now
 from django.urls import reverse_lazy
 from django.core.paginator import Paginator
+from .forms import EquipoForm
 
 ''' # vista anterior en funcion 
 # Create your views here.
@@ -78,6 +79,7 @@ class OrdenesPendientesListView(ListView):
     model = Ordenes
     template_name = 'ordenes/ordenes_pendientes.html'
     context_object_name = 'ordenes'
+    paginate_by = 15  # ✅ Paginación: 15 por página
 
     def get_queryset(self):
         return Ordenes.objects.select_related(
@@ -100,33 +102,70 @@ class OrdenesPendientesListView(ListView):
             })
 
         context['ordenes'] = datos_ordenes
+        context['total_ordenes'] = self.get_queryset().count()  # ✅ Total de órdenes pendientes
         return context
 
+# class RevisarOrdenUpdateView(UpdateView):
+#     model = Ordenes
+#     fields = ['falla_detectada', 'reparacion', 'destino']  # Campos editables
+#     template_name = 'ordenes/revisar_orden.html'
+#     success_url = reverse_lazy('ordenes_pendientes')
+
+#     def get_context_data(self, **kwargs):
+#         context = super().get_context_data(**kwargs)
+#         context['estados'] = Estados.objects.all()
+#         context['destinos'] = Destinos.objects.all()
+#         return context
+
+#     def form_valid(self, form):
+#         orden = form.instance
+
+#         # Asignar usuario desde request
+#         orden._request = self.request
+
+#         # Actualizar estado y fecha
+#         estado_revisado, _ = Estados.objects.get_or_create(nombre_estado='Revisado')
+#         orden.estado_id = estado_revisado
+#         orden.fecha_revision = now()
+        
+#         return super().form_valid(form)
+    
 class RevisarOrdenUpdateView(UpdateView):
     model = Ordenes
-    fields = ['falla_detectada', 'reparacion', 'destino']  # Campos editables
+    fields = ['falla_detectada', 'reparacion', 'destino']
     template_name = 'ordenes/revisar_orden.html'
     success_url = reverse_lazy('ordenes_pendientes')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['estados'] = Estados.objects.all()
-        context['destinos'] = Destinos.objects.all()
+        orden = self.object
+        equipo_form = kwargs.get('equipo_form') or EquipoForm(instance=orden.equipo_id)
+        context.update({
+            'estados': Estados.objects.all(),
+            'destinos': Destinos.objects.all(),
+            'equipo_form': equipo_form
+        })
         return context
 
-    def form_valid(self, form):
-        orden = form.instance
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        form = self.get_form()
+        equipo_form = EquipoForm(request.POST, instance=self.object.equipo_id)
 
-        # Asignar usuario desde request
-        orden._request = self.request
+        if form.is_valid() and equipo_form.is_valid():
+            orden = form.save(commit=False)
+            orden._request = self.request
+            orden.estado_id, _ = Estados.objects.get_or_create(nombre_estado='Revisado')
+            orden.fecha_revision = now()
+            orden.save()
+            equipo_form.save()
+            return self.form_valid(form)
+        else:
+            # 👇 importante: pasar `form` explícitamente al contexto
+            return self.render_to_response(
+                self.get_context_data(form=form, equipo_form=equipo_form)
+            )
 
-        # Actualizar estado y fecha
-        estado_revisado, _ = Estados.objects.get_or_create(nombre_estado='Revisado')
-        orden.estado_id = estado_revisado
-        orden.fecha_revision = now()
-        
-        return super().form_valid(form)
-    
 
 # creando solo ordenes activas de prueba
 class OrdenesActivasListView(ListView):
