@@ -65,7 +65,7 @@ Verificar que este copiada la base
 
 ✅ Crear entorno virtual
 
-    python -m venv venv
+    python -m venv env
 
 ✅ Activarlo
 
