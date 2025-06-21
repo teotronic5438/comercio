@@ -1,0 +1,300 @@
+{# apps/despachos/templates/despachos/revisados.html #}
+{% extends 'base.html' %} 
+{% load static %}
+
+{% block title %}Órdenes Revisadas{% endblock %} 
+
+{% block extra_head %}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.8.1/font/bootstrap-icons.min.css">
+    <style>
+        /* Estilos para la barra superior de acciones */
+        .top-action-bar {
+            display: flex;
+            flex-direction: column; /* Cambiado a columna para apilar elementos */
+            padding: 1rem;
+            border-radius: 0.25rem;
+            background-color: #f8f9fa;
+            border: 1px solid #e9ecef;
+            margin-bottom: 1.5rem; /* Espacio debajo de la barra superior */
+        }
+
+        .top-action-bar .row {
+            width: 100%; /* Las filas ocupan todo el ancho */
+            display: flex;
+            align-items: center;
+            justify-content: space-between; /* Espacia los elementos */
+            margin-bottom: 0.5rem; /* Espacio entre filas */
+        }
+
+        .top-action-bar .row:last-child {
+            margin-bottom: 0; /* No hay margen en la última fila */
+        }
+
+        .top-action-bar .form-group {
+            margin-bottom: 0; 
+            margin-right: 1rem; /* Margen a la derecha para separación */
+        }
+        
+        .top-action-bar .btn-group {
+            display: flex;
+            gap: 0.5rem; /* Espacio entre los botones "Aplicar" y "Limpiar" */
+        }
+
+        /* Ajuste para el campo de búsqueda */
+        .search-input-group {
+            max-width: 300px; 
+            flex-grow: 1; /* Permite que el campo de búsqueda se expanda */
+        }
+
+        /* Estilo para los badges de estado en la tabla */
+        .badge-estado {
+            padding: 0.35em 0.65em;
+            font-size: 0.75em;
+            font-weight: 700;
+            line-height: 1;
+            text-align: center;
+            white-space: nowrap;
+            vertical-align: baseline;
+            border-radius: 0.25rem;
+            display: inline-block;
+        }
+
+        /* Colores de badges - mapea con el nombre del estado en minúsculas.
+           Si tus estados tienen espacios, la clase CSS también los tendrá.
+           Ej: "En Depósito" -> "bg-en depósito" */
+        .badge-estado.bg-revisado { background-color: #6c757d; color: #fff; } /* Gris */
+        .badge-estado.bg-nuevo { background-color: #0dcaf0; color: #fff; }    /* Azul claro */
+        .badge-estado.bg-averia { background-color: #dc3545; color: #fff; }    /* Rojo */
+        .badge-estado.bg-destruccion { background-color: #343a40; color: #fff; } /* Negro */
+        .badge-estado.bg-en-depósito { background-color: #28a745; color: #fff; } /* Verde para "En Depósito" */
+        .badge-estado.bg-despachado { background-color: #ffc107; color: #212529; } /* Amarillo para "Despachado" */
+        .badge-estado.bg-desconocido, .badge-estado.bg-otro { background-color: #e2e6ea; color: #212529; } /* Blanco/claro para otros */
+
+    </style>
+{% endblock %}
+
+{% block content %}
+    <div class="container mt-4">
+        <h2>Órdenes Revisadas</h2> {# Título de la página #}
+
+        {# Mensajes de Django #}
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}" role="alert">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        {# --- BARRA SUPERIOR: FILTRO DE DESTINO, BÚSQUEDA, Y BOTONES DE ACCIÓN --- #}
+        <div class="top-action-bar">
+            <form id="filtro-busqueda-form" action="{% url 'despachos:ordenes_revisadas' %}" method="GET" class="w-100">
+                <div class="row mb-2"> {# Primera fila: Filtro por Destino y Botones de Acción #}
+                    {# Dropdown de filtro por DESTINO #}
+                    <div class="col-md-4 col-sm-6 mb-2 mb-md-0">
+                        <div class="form-group input-group">
+                            <label class="input-group-text" for="filtro_destino">Filtrar por Destino:</label>
+                            <select class="form-select" id="filtro_destino" name="filtro_destino">
+                                <option value="todos" {% if filtro_destino_seleccionado == 'todos' %}selected{% endif %}>Todos</option>
+                                <option value="nuevo" {% if filtro_destino_seleccionado == 'nuevo' %}selected{% endif %}>Nuevo</option>
+                                <option value="averia" {% if filtro_destino_seleccionado == 'averia' %}selected{% endif %}>Avería</option>
+                                <option value="destruccion" {% if filtro_destino_seleccionado == 'destruccion' %}selected{% endif %}>Destrucción</option>
+                                {# Depósito se excluye aquí porque no lo quieres como filtro visible #}
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-8 col-sm-6 d-flex justify-content-end align-items-center"> {# Botones de Acción #}
+                        {# ÚNICAMENTE el botón "Enviar a Despacho" #}
+                        {% if mostrar_boton_despacho %}
+                            <button type="button" class="btn btn-success" id="btn-enviar-despacho-principal" data-bs-toggle="modal" data-bs-target="#despachoModal">
+                                <i class="bi bi-send-fill me-2"></i> Enviar a Despacho
+                            </button>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="row"> {# Segunda fila: Búsqueda y Botones de Aplicar/Limpiar #}
+                    <div class="col-md-6 col-sm-12">
+                        {# Campo de búsqueda por ID Orden o Nro. Serie #}
+                        <div class="form-group input-group search-input-group">
+                            <input type="text" class="form-control" 
+                                placeholder="Buscar por ID Orden o Nro. Serie" 
+                                name="q" value="{{ query_actual|default:'' }}">
+                            <button class="btn btn-primary" type="submit">
+                                <i class="bi bi-search"></i> Buscar
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6 col-sm-12 d-flex justify-content-end align-items-center mt-2 mt-md-0">
+                        {# Botones "Aplicar Filtros" y "Limpiar Filtros" para la búsqueda y el filtro de destino #}
+                        <div class="btn-group">
+                            <button class="btn btn-primary" type="submit">
+                                <i class="bi bi-funnel"></i> Aplicar Filtros
+                            </button>
+                            <a href="{% url 'despachos:ordenes_revisadas' %}" class="btn btn-secondary">Limpiar Filtros</a>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        {# Mensajes de información sobre la tabla #}
+        {% if mensaje_busqueda %}
+            <div class="alert alert-warning" role="alert">{{ mensaje_busqueda }}</div>
+        {% elif not ordenes and not query_actual and filtro_destino_seleccionado == 'todos' %} 
+            <div class="alert alert-info" role="alert">No hay órdenes para mostrar en este momento.</div>
+        {% elif not ordenes and query_actual %}
+            <div class="alert alert-info" role="alert">No se encontraron órdenes para la búsqueda "{{ query_actual }}".</div>
+        {% elif not ordenes and filtro_destino_seleccionado != 'todos' %}
+            {# Este mensaje asume que la vista te pasa el nombre del destino seleccionado para mostrarlo #}
+            {# Si no, mostrará el ID o un mensaje genérico como "No hay órdenes con el destino seleccionado." #}
+            <div class="alert alert-info" role="alert">No hay órdenes con el destino seleccionado.</div>
+        {% endif %}
+
+        {# FORMULARIO DE DESPACHO Y TABLA #}
+        {% if ordenes %}
+            <form id="form-despacho" action="{% url 'despachos:procesar_despacho_ordenes' %}" method="POST">
+                {% csrf_token %}
+                
+                <table class="table table-striped table-hover mt-3">
+                    <thead>
+                        <tr>
+                            <th><input type="checkbox" id="checkbox-maestro-despacho"></th>
+                            <th>ID Orden</th>
+                            <th>Equipo</th>
+                            <th>Número de Serie</th>
+                            <th>Marca</th>
+                            <th>Modelo Producto</th>
+                            <th>Fecha Creación</th>
+                            <th>Estado</th> {# Columna para el ESTADO de la orden #}
+                            <th>Destino Actual</th> {# Columna para el DESTINO ACTUAL de la orden #}
+                            <th>Falla Detectada</th>
+                            <th>Reparación</th>
+                            <th>Fecha Revisión</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for orden in ordenes %}
+                            <tr>
+                                <td><input type="checkbox" class="checkbox-item-despacho" name="orden_ids" value="{{ orden.id }}"></td>
+                                <td>{{ orden.id }}</td>
+                                <td>{{ orden.equipo_id }}</td> 
+                                <td>{{ orden.numero_serie }}</td>
+                                <td>{{ orden.marca }}</td> 
+                                <td>{{ orden.modelo }}</td>
+                                <td>{{ orden.fecha_creacion|date:"d/m/Y H:i" }}</td> 
+                                <td><span class="badge-estado bg-{{ orden.estado|lower }}">{{ orden.estado }}</span></td>
+                                <td>{{ orden.destino }}</td> {# Aquí se muestra el destino actual de la orden #}
+                                <td>{{ orden.falla_detectada }}</td>
+                                <td>{{ orden.reparacion }}</td>
+                                <td>{{ orden.fecha_revision|default:"N/A"|date:"d/m/Y H:i" }}</td> 
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </form>
+        {% endif %}
+
+        {# MODAL DE DESPACHO (Ventana emergente para seleccionar el destino del lote) #}
+        <div class="modal fade" id="despachoModal" tabindex="-1" aria-labelledby="despachoModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="despachoModalLabel">Seleccionar Destino de Despacho</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>¿A qué destino deseas enviar las órdenes seleccionadas?</p>
+                        <div class="mb-3">
+                            <label for="modal-select-destino" class="form-label">Destino:</label>
+                            <select class="form-select" id="modal-select-destino" required>
+                                <option value="">Seleccionar Destino</option>
+                                {% for destino in destinos_para_despacho %}
+                                    {# Incluir "Depósito" aquí si es un destino válido para el despacho #}
+                                    <option value="{{ destino.id }}">{{ destino.nombre_destino }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="button" class="btn btn-success" id="confirm-despacho-btn">Confirmar Despacho</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const checkboxMaestroDespacho = document.getElementById('checkbox-maestro-despacho');
+            const checkboxesItemDespacho = document.querySelectorAll('.checkbox-item-despacho');
+            const btnEnviarDespachoPrincipal = document.getElementById('btn-enviar-despacho-principal');
+            const formDespacho = document.getElementById('form-despacho');
+            const modalSelectDestino = document.getElementById('modal-select-destino');
+            const confirmDespachoBtn = document.getElementById('confirm-despacho-btn');
+            const despachoModal = new bootstrap.Modal(document.getElementById('despachoModal'));
+
+            // Lógica del checkbox maestro
+            if (checkboxMaestroDespacho) {
+                checkboxMaestroDespacho.addEventListener('change', function() {
+                    checkboxesItemDespacho.forEach(checkbox => {
+                        checkbox.checked = checkboxMaestroDespacho.checked;
+                    });
+                });
+            }
+
+            // Lógica para checkboxes individuales
+            checkboxesItemDespacho.forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    if (checkboxMaestroDespacho) {
+                        // Actualiza el checkbox maestro si todos los ítems están marcados o no
+                        checkboxMaestroDespacho.checked = Array.from(checkboxesItemDespacho).every(item => item.checked);
+                    }
+                });
+            });
+
+            // Lógica para abrir el modal al hacer clic en "Enviar a Despacho"
+            if (btnEnviarDespachoPrincipal) {
+                btnEnviarDespachoPrincipal.addEventListener('click', function(event) {
+                    const selectedOrders = document.querySelectorAll('input[name="orden_ids"]:checked');
+                    if (selectedOrders.length === 0) {
+                        alert('Por favor, selecciona al menos una orden para despachar.');
+                        event.preventDefault(); 
+                        return; // Evita que se abra el modal si no hay órdenes seleccionadas
+                    }
+                    // Si hay órdenes seleccionadas, abrimos el modal
+                    despachoModal.show();
+                    // Limpiar la selección anterior del modal por si acaso
+                    modalSelectDestino.value = '';
+                });
+            }
+
+            // Lógica para confirmar el despacho desde el modal
+            if (confirmDespachoBtn) {
+                confirmDespachoBtn.addEventListener('click', function() {
+                    const destinoId = modalSelectDestino.value;
+                    if (destinoId === '') {
+                        alert('Por favor, selecciona un destino de despacho.');
+                        return;
+                    }
+                    
+                    // Busca el input oculto o lo crea si no existe
+                    let hiddenInput = formDespacho.querySelector('input[name="destino_id_despacho"]');
+                    if (!hiddenInput) {
+                        hiddenInput = document.createElement('input');
+                        hiddenInput.type = 'hidden';
+                        hiddenInput.name = 'destino_id_despacho';
+                        formDespacho.appendChild(hiddenInput);
+                    }
+                    // Asigna el valor seleccionado del modal al input oculto
+                    hiddenInput.value = destinoId;
+
+                    // Envía el formulario principal
+                    formDespacho.submit();
+                });
+            }
+        });
+    </script>
+{% endblock %}

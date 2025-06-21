@@ -1,7 +1,6 @@
 <div id="sidebar" class="bg-secondary text-white p-3" style="width: 200px">
   <h5>Menú</h5>
   <ul class="nav flex-column">
-    <!-- INGRESOS -->
     <li class="nav-item">
       <a
         class="nav-link text-white d-flex justify-content-between align-items-center"
@@ -13,8 +12,7 @@
       >
         Ingresos
         <span class="ms-auto">&#9662;</span>
-        <!-- flechita ▼ -->
-      </a>
+        </a>
       <ul class="collapse list-unstyled ps-3" id="submenuIngresos">
         <li>
           <a class="nav-link text-white" href="{% url 'ingresos' %}"
@@ -29,12 +27,10 @@
       </ul>
     </li>
 
-    <!-- STOCK -->
     <li class="nav-item">
       <a class="nav-link text-white" href="{% url 'stock' %}">Stock</a>
     </li>
 
-    <!-- ORDENES -->
     <li class="nav-item">
       <a class="nav-link text-white" href="{% url 'ordenes_pendientes' %}"
         >Ordenes</a
@@ -46,14 +42,10 @@
       >
     </li>
 
-   <!-- REVISADOS -->
-    <li class="nav-item">
-      <!--Apunta a la app 'despachos' -->
-      <!-- Usamos 'despachos:ordenes_revisadas' porque definimos app_name = 'despachos' en su urls.py -->
+   <li class="nav-item">
       <a class="nav-link text-white" href="{% url 'despachos:ordenes_revisadas' %}">Revisados</a>
     </li>
 
-    <!-- DESPACHOS -->
     <li class="nav-item">
       <a
         class="nav-link text-white d-flex justify-content-between align-items-center"
@@ -65,17 +57,14 @@
       >
         Despachos
         <span class="ms-auto">&#9662;</span>
-        <!-- flechita ▼ -->
-      </a>
+        </a>
       <ul class="collapse list-unstyled ps-3" id="submenuDespachos">
-        
-        <li><a class="nav-link text-white" href="#">Nuevos</a></li>
-        <li><a class="nav-link text-white" href="#">Averías</a></li>
-        <li><a class="nav-link text-white" href="#">Destrucción</a></li>
+        <li><a class="nav-link text-white" href="{% url 'despachos:ordenes_nuevas' %}">Nuevos</a></li>
+        <li><a class="nav-link text-white" href="{% url 'despachos:ordenes_averiadas' %}">Averías</a></li>
+        <li><a class="nav-link text-white" href="{% url 'despachos:ordenes_destruccion' %}">Destrucción</a></li>
       </ul>
     </li>
 
-    <!-- REPORTES -->
     <li class="nav-item">
       <a class="nav-link text-white" href="#">Reportes</a>
     </li>

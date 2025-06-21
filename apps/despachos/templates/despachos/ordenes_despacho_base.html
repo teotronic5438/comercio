@@ -1,0 +1,279 @@
+{% extends 'base.html' %} {# O el template base que uses para tu layout
+principal #} {% load static %} {% block extra_head %} {# Asegúrate de que esta
+ruta a tu CSS sea correcta #}
+<link href="{% static 'css/tu_estilo.css' %}" rel="stylesheet" />
+<style>
+  /* Puedes añadir estilos específicos aquí si necesitas */
+  .table-responsive {
+    margin-top: 20px;
+  }
+  .filter-section {
+    margin-bottom: 20px;
+  }
+  .btn-action-group {
+    margin-top: 20px;
+  }
+</style>
+{% endblock %} {% block content %}
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-md-12">
+      <h1 class="my-4">{{ titulo_pagina }}</h1>
+      {# Título dinámico #} {% if messages %}
+      <div class="messages">
+        {% for message in messages %}
+        <div
+          class="alert alert-{{ message.tags }} alert-dismissible fade show"
+          role="alert"
+        >
+          {{ message }}
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="alert"
+            aria-label="Close"
+          ></button>
+        </div>
+        {% endfor %}
+      </div>
+      {% endif %} {# Sección de búsqueda #}
+      <div class="card shadow mb-4">
+        <div class="card-header py-3">
+          <h6 class="m-0 font-weight-bold text-primary">Buscar Órdenes</h6>
+        </div>
+        <div class="card-body">
+          <form method="GET" action="">
+            <div class="input-group mb-3">
+              <input
+                type="text"
+                class="form-control"
+                placeholder="Buscar por ID de Orden o N° de Serie"
+                name="q"
+                value="{{ query_actual }}"
+              />
+              <button class="btn btn-primary" type="submit">Buscar</button>
+            </div>
+          </form>
+          {% if mensaje_busqueda %}
+          <div class="alert alert-info mt-3">{{ mensaje_busqueda }}</div>
+          {% endif %}
+        </div>
+      </div>
+
+      {# Tabla de Órdenes #}
+      <div class="card shadow mb-4">
+        <div class="card-header py-3">
+          <h6 class="m-0 font-weight-bold text-primary">Listado de Órdenes</h6>
+        </div>
+        <div class="card-body">
+          {% if ordenes %}
+          <form
+            id="form-armar-pallet"
+            method="POST"
+            action="{% url 'despachos:procesar_despacho_ordenes' %}"
+          >
+            {% csrf_token %}
+            <div class="table-responsive">
+              <table
+                class="table table-bordered"
+                id="dataTable"
+                width="100%"
+                cellspacing="0"
+              >
+                <thead>
+                  <tr>
+                    <th>
+                      <input type="checkbox" id="checkbox-maestro-pallet" />
+                    </th>
+                    <th>ID Orden</th>
+                    <th>Número de Serie</th>
+                    <th>Modelo</th>
+                    <th>Marca</th>
+                    <th>Fecha Creación</th>
+                    <th>Estado</th>
+                    <th>Destino</th>
+                    <th>Falla Detectada</th>
+                    <th>Reparación</th>
+                    <th>Fecha Revisión</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for orden in ordenes %}
+                  <tr>
+                    <td>
+                      <input
+                        type="checkbox"
+                        class="checkbox-item-pallet"
+                        name="orden_ids"
+                        value="{{ orden.id }}"
+                      />
+                    </td>
+                    <td>{{ orden.id }}</td>
+                    <td>{{ orden.numero_serie }}</td>
+                    <td>{{ orden.modelo }}</td>
+                    <td>{{ orden.marca }}</td>
+                    <td>{{ orden.fecha_creacion|date:"d/m/Y H:i" }}</td>
+                    <td>{{ orden.estado }}</td>
+                    <td>{{ orden.destino }}</td>
+                    <td>{{ orden.falla_detectada|default:"N/A" }}</td>
+                    <td>{{ orden.reparacion|default:"N/A" }}</td>
+                    <td>{{ orden.fecha_revision|default:"N/A" }}</td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+            <div class="d-flex justify-content-end mt-3">
+              {% if mostrar_boton_armar_pallet %}
+              <button
+                type="button"
+                class="btn btn-success"
+                id="btn-armar-pallet-principal"
+              >
+                Armar Pallet (Máx: {{ max_items_pallet }})
+              </button>
+              {% endif %}
+            </div>
+          </form>
+          {% else %}
+          <div class="alert alert-info">
+            No hay órdenes para mostrar en este estado/destino.
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{# Modal para armar Pallet #}
+<div
+  class="modal fade"
+  id="armarPalletModal"
+  tabindex="-1"
+  aria-labelledby="armarPalletModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="armarPalletModalLabel">
+          Confirmar Armado de Pallet
+        </h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="modal-body">
+        ¿Estás seguro de que quieres armar un pallet con
+        <span id="num-ordenes-seleccionadas">0</span> órdenes seleccionadas?
+        <p class="text-danger mt-2">
+          Máximo {{ max_items_pallet }} ítems por pallet.
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+          Cancelar
+        </button>
+        <button
+          type="button"
+          class="btn btn-success"
+          id="confirm-armar-pallet-btn"
+        >
+          Confirmar Armado
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock %} {% block extra_js %}
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const checkboxMaestroPallet = document.getElementById(
+      "checkbox-maestro-pallet"
+    );
+    const checkboxesItemPallet = document.querySelectorAll(
+      ".checkbox-item-pallet"
+    );
+    const btnArmarPalletPrincipal = document.getElementById(
+      "btn-armar-pallet-principal"
+    );
+    const formArmarPallet = document.getElementById("form-armar-pallet");
+    const confirmArmarPalletBtn = document.getElementById(
+      "confirm-armar-pallet-btn"
+    );
+    const armarPalletModal = new bootstrap.Modal(
+      document.getElementById("armarPalletModal")
+    );
+    const numOrdenesSeleccionadasSpan = document.getElementById(
+      "num-ordenes-seleccionadas"
+    );
+    const maxItemsPallet = { max_items_pallet };
+
+    // Lógica del checkbox maestro
+    if (checkboxMaestroPallet) {
+      checkboxMaestroPallet.addEventListener("change", function () {
+        checkboxesItemPallet.forEach((checkbox) => {
+          checkbox.checked = checkboxMaestroPallet.checked;
+        });
+        updateSelectedCount();
+      });
+    }
+
+    // Lógica para checkboxes individuales
+    checkboxesItemPallet.forEach((checkbox) => {
+      checkbox.addEventListener("change", function () {
+        if (checkboxMaestroPallet && !this.checked) {
+          checkboxMaestroPallet.checked = false;
+        }
+        updateSelectedCount();
+      });
+    });
+
+    // Función para actualizar el contador de órdenes seleccionadas en el modal
+    function updateSelectedCount() {
+      const selectedOrders = document.querySelectorAll(
+        'input[name="orden_ids"]:checked'
+      );
+      numOrdenesSeleccionadasSpan.textContent = selectedOrders.length;
+    }
+
+    // Lógica para abrir el modal al hacer clic en "Armar Pallet"
+    if (btnArmarPalletPrincipal) {
+      btnArmarPalletPrincipal.addEventListener("click", function (event) {
+        const selectedOrders = document.querySelectorAll(
+          'input[name="orden_ids"]:checked'
+        );
+        if (selectedOrders.length === 0) {
+          alert(
+            "Por favor, selecciona al menos una orden para armar el pallet."
+          );
+          event.preventDefault();
+          return;
+        }
+        if (selectedOrders.length > maxItemsPallet) {
+          alert(
+            `No puedes seleccionar más de ${maxItemsPallet} ítems para un pallet. Seleccionaste ${selectedOrders.length}.`
+          );
+          event.preventDefault();
+          return;
+        }
+        updateSelectedCount(); // Actualiza el conteo en el modal antes de mostrarlo
+        armarPalletModal.show();
+      });
+    }
+
+    // Lógica para confirmar el armado del pallet desde el modal
+    if (confirmArmarPalletBtn) {
+      confirmArmarPalletBtn.addEventListener("click", function () {
+        formArmarPallet.submit(); // Envía el formulario
+        // El modal se cerrará automáticamente o se redirigirá la página
+      });
+    }
+  }); //
+</script>
+{% endblock %}
