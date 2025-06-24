@@ -1,12 +1,29 @@
 from django.contrib.auth.models import BaseUserManager,  AbstractBaseUser
 from django.db import models
+from django.core.exceptions import ValidationError
+
 
 class Roles(models.Model):
+    ROLES_PERMITIDOS = ['tecnico', 'administrativo', 'sistemas', 'supervisor']
+
     id = models.AutoField(primary_key=True)
     nombre = models.CharField(max_length=50)
 
     def __str__(self):
         return self.nombre
+
+    def clean(self):
+        if self.nombre.lower() not in self.ROLES_PERMITIDOS:
+            raise ValidationError({
+                'nombre': f"'{self.nombre}' no es un rol válido. Debe ser uno de: {', '.join(self.ROLES_PERMITIDOS)}"
+            })
+
+# class Roles(models.Model):
+#     id = models.AutoField(primary_key=True)
+#     nombre = models.CharField(max_length=50)
+
+#     def __str__(self):
+#         return self.nombre
 
 
 class UsuariosManager(BaseUserManager):
@@ -53,8 +70,8 @@ class Usuarios(AbstractBaseUser):
     email = models.EmailField('Correo electronico', max_length=254, unique= True)
     nombre = models.CharField(max_length=50)
     apellido = models.CharField(max_length=50)
-    #rol = models.ForeignKey(Roles, on_delete=models.CASCADE)
-    rol = models.CharField(max_length=20)
+    rol = models.ForeignKey(Roles, on_delete=models.CASCADE)
+    #rol = models.CharField(max_length=20)
     activo = models.BooleanField(default=True)
     is_admin = models.BooleanField(default = False)
     is_superuser = models.BooleanField(default=False)
@@ -74,7 +91,11 @@ class Usuarios(AbstractBaseUser):
     
     def has_module_perms(self, app_label):
         return True
-
+    
+    def get_rol(self):
+        return self.rol   
+    
+    
 """
 class Roles(models.Model):
     id = models.AutoField(primary_key=True)

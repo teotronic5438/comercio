@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth import authenticate
-from .models import Usuarios
+from .models import Usuarios, Roles
 
 
 class FormularioLogin(AuthenticationForm):
@@ -34,6 +34,8 @@ class FormularioUsuario(forms.ModelForm):
         'required': 'required',
         }
     ))
+    
+   
 
     class Meta: 
         model = Usuarios
@@ -58,12 +60,12 @@ class FormularioUsuario(forms.ModelForm):
                     'placeholder' : 'Ingrese su apellido',
                 }
             ),
-            'rol': forms.TextInput(
-                attrs= {
-                    'class': 'form-control',
-                    'placeholder' : 'Ingrese el rol',
-                }
-            ), 
+            # 'rol': forms.TextInput(
+            #     attrs= {
+            #         'class': 'form-control',
+            #         'placeholder' : 'Ingrese el rol',
+            #     }
+            # ), 
             'username': forms.TextInput(
                 attrs= {
                     'class': 'form-control',
@@ -71,6 +73,16 @@ class FormularioUsuario(forms.ModelForm):
                 }
             )
         }
+    
+    rol = forms.ModelChoiceField(
+        queryset=Roles.objects.all(),
+        empty_label="Seleccione un rol",
+        label="Rol del usuario",
+        widget=forms.Select(attrs={'class': 'form-select'})
+    )    
+        
+        
+        
     def clean_password2(self):  #validacion de contraseña del form personalizado
         password1 = self.cleaned_data.get('password1')
         password2 = self.cleaned_data.get('password2')
