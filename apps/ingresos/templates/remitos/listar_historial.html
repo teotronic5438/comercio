@@ -26,12 +26,9 @@
       <td>{{ remito.deposito_id }}</td>
       <td>{{ remito.fecha_ingreso }}</td>
       <td>{{ remito.usuario_id }}</td>
-      <td>{{ remito.aprobado }}</td>
+      <td>{{ remito.aprobado|yesno:"Sí,No"}}</td>
       <td>
-        [<a href="{% url 'editar_remito' remito.pk %}">Editar</a>] [<a
-          href="{% url 'eliminar_remito' remito.pk %}"
-          >Eliminar</a
-        >]
+        [<a href="{% url 'ver_remito' remito.pk %}">Ver</a>]
       </td>
     </tr>
     {% empty %}
