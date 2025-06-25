@@ -31,6 +31,14 @@ class UsuariosManager(BaseUserManager):
         if not email:
             raise ValueError("Usuario tiene que tenr un email")
         
+        #busca y convierte el int ingresado a una istancia de objeto Rol
+        #permite crear por consola el superuser con el campo rol indicando el ID
+        if isinstance(rol, int):
+            try:
+                rol = Roles.objects.get(pk=rol)
+            except Roles.DoesNotExist:
+                raise ValueError(f"No existe un rol con ID {rol}.")
+            
         usuario = self.model(
             username = username,
             email=self.normalize_email(email),
@@ -66,18 +74,17 @@ class UsuariosManager(BaseUserManager):
 
 
 class Usuarios(AbstractBaseUser):
+    
     username = models.CharField('Nombre de usuario', unique= True, max_length=60)
     email = models.EmailField('Correo electronico', max_length=254, unique= True)
     nombre = models.CharField(max_length=50)
     apellido = models.CharField(max_length=50)
-    rol = models.ForeignKey(Roles, on_delete=models.CASCADE)
+    rol = models.ForeignKey( Roles, on_delete=models.CASCADE)
     #rol = models.CharField(max_length=20)
     activo = models.BooleanField(default=True)
     is_admin = models.BooleanField(default = False)
     is_superuser = models.BooleanField(default=False)
     is_staff = models.BooleanField(default=False)
-   
-
     objects = UsuariosManager()
      
     USERNAME_FIELD = 'username' 
