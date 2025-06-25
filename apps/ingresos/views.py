@@ -86,6 +86,14 @@ def editar_remito(request, pk):
 
     return render(request, 'remitos/formulario.html', {'form': form, 'formset': formset})
 
+def ver_remito(request, pk):
+    remito = get_object_or_404(Remitos, pk=pk)
+    productos_relacionados = RemitoProducto.objects.filter(remito_id=remito)
+
+    return render(request, 'remitos/ver_formulario.html', {'remito': remito, 
+                                                           'productos_relacionados': productos_relacionados,
+                                                           })
+
 
 # Aplica las mismas líneas de depuración a la función editar_remito
 

@@ -14,7 +14,7 @@
                 <th>Depósito</th>
                 <th>Fecha de ingreso</th>
                 <th>Usuario</th>
-                <th>Aprobado</th>
+                <!-- <th>Aprobado</th> -->
                 <th>Acciones</th>
             </tr>
         </thead>
@@ -27,8 +27,8 @@
                 <td>{{ remito.detalle_transporte }}</td>
                 <td>{{ remito.deposito_id }}</td>
                 <td>{{ remito.fecha_ingreso }}</td>
-                <td>{{ remito.usuario_id }}</td>
-                <td>{{ remito.aprobado }}</td>
+                <td>{{ remito.usuario.nombre }}</td>
+                <!-- <td>{{ remito.aprobado }}</td> -->
                 <td>
                     <a href="{% url 'editar_remito' remito.pk %}"><span class="badge bg-warning mx-2">Editar</span></a>
                     <a href="{% url 'eliminar_remito' remito.pk %}"><span class="badge bg-danger mx-2">Eliminar</span></a>

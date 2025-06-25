@@ -9,7 +9,7 @@
 from django.conf import settings
 from django.conf.urls.static import static
 from django.urls import path
-from .views import crear_remito, editar_remito, eliminar_remito, aprobar_remito
+from .views import crear_remito, editar_remito, eliminar_remito, aprobar_remito, ver_remito
 
 #Clases
 from .views import ListarRemitosView, ListarRemitosHistorialView
@@ -29,6 +29,8 @@ urlpatterns = [
     path('aprobar/<int:pk>/', aprobar_remito, name='aprobar_remito'),
     path('remitos/', remito_list, name='remitos-list'),
     path('remitos/crear/', remito_create, name='remito-create'),
+    path('ver/<int:pk>/', ver_remito, name='ver_remito'),
+    
 ]
 
 
