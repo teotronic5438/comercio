@@ -54,8 +54,8 @@ class RegistrarUsuario(CreateView):
                   )
                   nuevo_usuario.set_password(form.cleaned_data.get('password1'))
                   nuevo_usuario.save()
-                  messages.success(request, '¡Registro exitoso! Loguese para acceder')
-                  return redirect('core:home')
+                  messages.success(request, '¡Registro exitoso! Ya puede iniciar sesion.')
+                  return redirect('usuarios:login')
             else:
                   return render(request, self.template_name, {'form': form})
       
