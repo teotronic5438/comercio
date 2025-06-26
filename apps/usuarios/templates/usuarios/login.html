@@ -1,35 +1,39 @@
 {% extends "base.html" %}
 
-
-
 {% block content %}
+<div class="container d-flex justify-content-center align-items-center" style="min-height: 75vh;">
+  <div class="card shadow p-4 rounded" style="min-width: 400px; max-width: 500px; width: 100%;">
+    <h3 class="text-center mb-4">Iniciar sesión</h3>
+    <form action="{% url 'usuarios:login' %}" method="post">
+      {% csrf_token %}
+      
+      {% if form.non_field_errors %}
+        <div class="alert alert-danger mb-3">
+          {% for error in form.non_field_errors %}
+            <p>{{ error }}</p>
+          {% endfor %}
+        </div>
+      {% endif %}
 
-    {% if form.errors  %}
-        <p> datos incorrectos </p>
-    {% endif %}
+      {% for field in form %}
+        <div class="form-group mb-3">
+          {{ field.label_tag }}
+          {{ field }}
+          {% if field.errors %}
+            <div class="text-danger">
+              {% for error in field.errors %}
+                <small>{{ error }}</small><br>
+              {% endfor %}
+            </div>
+          {% endif %}
+        </div>
+      {% endfor %}
 
-
-  <form class="" action="{% url 'usuarios:login' %}" method="post">
-        {% csrf_token %}
-			{{ form.as_p }}
-
-				{% for field in form %}
-				<p>
-				{% for error in field.errors %}
-				<p style="color: red">{{ error }}</p>
-				{% endfor %}
-				</p>
-				{% endfor %}
-				{% if form.non_field_errors %}
-				<div style="color: red">
-				<p>{{ form.non_field_errors }}</p>
-				</div>
-
-				{% endif %}
-
-       
-        <button class="btn btn-lg btn-primary btn-block" name="submit"> Log In</button>
-		<a href="{% url 'core:home' %}" class="btn btn-lg btn-danger btn-block" type="submit">Cancelar</a>
+      <div class="d-grid gap-2 d-md-flex justify-content-md-between mt-3">
+        <button class="btn btn-primary btn-lg" name="submit">Log In</button>
+        <a href="{% url 'core:home' %}" class="btn btn-danger btn-lg">Cancelar</a>
+      </div>
     </form>
-
+  </div>
+</div>
 {% endblock %}
