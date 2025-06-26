@@ -1,30 +1,30 @@
 {% load static %}
-<header class="header-logo">
-    <div class="logo-container d-flex">
-        <img class="img-logo" src="{% static 'img/enigma_img.jpg' %}" alt="LOGO DE RUBIC ENIGMA">
-        <h1 class="titulo-logo">ENIGMA</h1>           
-    </div>
+<nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm">
+  <div class="container-fluid">
+    <a class="navbar-brand d-flex align-items-center" href="{% url 'core:home' %}">
+      <img src="{% static 'img/enigma_img.jpg' %}" alt="LOGO DE RUBIC ENIGMA" width="30" height="30" class="me-2">
+      <span class="fw-bold">ENIGMA</span>
+    </a>
 
-     <div class="">
-            <a href="{% url 'core:home' %}"> Home</a>
-            {% if user.is_authenticated %}
-                Hola, {{ user.username }} , (rol) {{ user.rol }} 
-                <form action=" {% url 'usuarios:logout' %}" method='post'>
-                    {% csrf_token %}
-                <span> <button name='submit' class='btn btn-outline-secondary btn-sm'> >Log out</button></span>
-        </form>
-            {% else %}
-                <a href="{% url 'usuarios:register' %}"> Registrarse </a>
-                <a href="{% url 'usuarios:login' %}"> Login </a>
-            {% endif %}
-           
+    <div class="d-flex ms-auto">
+      {% if user.is_authenticated %}
+        <div class="dropdown">
+          <a class="btn btn-outline-secondary dropdown-toggle" href="#" role="button" id="dropdownUser" data-bs-toggle="dropdown" aria-expanded="false">
+            {{ user.username }} (rol {{ user.rol }})
+          </a>
+          <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownUser">
+            <li>
+              <form action="{% url 'usuarios:logout' %}" method="post" class="d-inline">
+                {% csrf_token %}
+                <button type="submit" class="dropdown-item">Cerrar sesión</button>
+              </form>
+            </li>
+          </ul>
+        </div>
+      {% else %}
+        <a href="{% url 'usuarios:register' %}" class="btn btn-outline-primary me-2">Registrarse</a>
+        <a href="{% url 'usuarios:login' %}" class="btn btn-outline-success">Login</a>
+      {% endif %}
     </div>
-
-    <div class="login-container d-flex flex-column align-items-center mx-3">
-        {% if show_navbar %}
-            
-        {% endif %}
-       
-    </div>
-</header>
-
+  </div>
+</nav>
