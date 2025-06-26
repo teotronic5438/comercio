@@ -2,16 +2,16 @@
 
 from django.db import models
 from apps.ordenes.models import Ordenes, Destinos, Estados
-from apps.ingresos.models import Remitos # Asegúrate de que esta importación sea correcta si usas Remitos
-from django.contrib.auth import get_user_model # Importa get_user_model
+from apps.ingresos.models import Remitos 
+from django.contrib.auth import get_user_model 
 
-# Importamos tu ModeloBaseConUsuario
+
 from apps.core.models import ModeloBaseConUsuario 
 
-User = get_user_model() # Obtiene el modelo de usuario activo
+User = get_user_model() 
 
 
-class Pallet(ModeloBaseConUsuario):  # <--- Hereda de ModeloBaseConUsuario
+class Pallet(ModeloBaseConUsuario):
     """
     Modelo para representar un Pallet en el sistema de despachos.
     Un pallet agrupa órdenes para su posterior despacho.
@@ -50,7 +50,7 @@ class Pallet(ModeloBaseConUsuario):  # <--- Hereda de ModeloBaseConUsuario
         request = getattr(self, "_request", None)
 
         if request and hasattr(request, 'user'):
-            # Si está despachando, actualizamos quién lo despachó
+
             if self.estado_pallet and self.estado_pallet.nombre_estado.lower() == 'despachado':
                 self.usuario_despacho = request.user
 
@@ -61,16 +61,12 @@ class DetallePallet(models.Model):
     Modelo para los detalles de un Pallet, conectando Pallets con Órdenes.
     """
     pallet = models.ForeignKey(Pallet, on_delete=models.CASCADE, related_name='detalles', verbose_name="Pallet")
-    # OneToOneField asegura que una orden solo puede estar en UN DetallePallet
     orden_id = models.OneToOneField(Ordenes, on_delete=models.CASCADE, related_name='detalle_pallet_asociado', verbose_name="Orden") 
     
-    # Eliminados: 'modelo' y 'serial' - se accede a través de orden_id.equipo_id.producto_id.modelo.nombre_modelo etc.
-    # cantidad = models.PositiveIntegerField(default=1) # Generalmente 1 por orden, se mantiene por si es útil
-
     class Meta:
         verbose_name = "Detalle de Pallet"
         verbose_name_plural = "Detalles de Pallet"
-        unique_together = ('pallet', 'orden_id') # Una orden solo puede estar una vez en un pallet
+        unique_together = ('pallet', 'orden_id')
 
     def __str__(self):
         return f"Detalle de Pallet {self.pallet.nro_pallet} - Orden {self.orden_id.id}"

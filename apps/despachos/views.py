@@ -149,7 +149,7 @@ class OrdenesRevisadasView(View):
 
         ordenes_queryset = Ordenes.objects.filter(
             estado_id=estado_revisado_obj,
-            equipo_palletizado=False # Solo órdenes revisadas que AÚN NO estén palletizadas
+            equipo_palletizado=False
         ).select_related(
             'destino', 'equipo_id', 'equipo_id__producto_id', 'estado_id'
         ).order_by('-fecha_creacion')
