@@ -75,7 +75,7 @@ En Windows:
 
 En Linux/macOS:
 
-    source venv/bin/activate
+    source env/bin/activate
 
 ✅ Desactivarlo
 
@@ -99,11 +99,11 @@ En Linux/macOS:
 
 ✅ Crear migraciones a partir de modelos
 
-    python manage.py makemigrations
+    python3 manage.py makemigrations
 
 ✅ Aplicar migraciones (crear las tablas en la BD)
 
-    python manage.py migrate
+    python3 manage.py migrate
 
 ✅ Entrar al shell interactivo
 
