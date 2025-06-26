@@ -7,6 +7,6 @@ urlpatterns = [
     # path('pendientes/', views.ordenes_pendientes, name='ordenes_pendientes'),
     # path('revisar/<int:orden_id>/', views.revisar_orden, name='revisar_orden'),
     path('pendientes/', login_required(OrdenesPendientesListView.as_view()), name='ordenes_pendientes'),
-    path('revisar/<int:pk>/', (RevisarOrdenUpdateView.as_view()), name='revisar_orden'),
-    path('ordenes/activas/', (OrdenesActivasListView.as_view()), name='ordenes_activas'),
+    path('revisar/<int:pk>/', login_required(RevisarOrdenUpdateView.as_view()), name='revisar_orden'),
+    path('ordenes/activas/', login_required(OrdenesActivasListView.as_view()), name='ordenes_activas'),
 ]
