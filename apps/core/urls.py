@@ -11,5 +11,5 @@ urlpatterns = [
     #path('logout/', logout, name='Logout'), BORRADO xq se accede desde usuarios:logout
     # path('', home, name ='home'),
     # path('dashboard-ordenes/', DashboardOrdenesView.as_view(), name='dashboard_ordenes'),
-    path('dashboard/', DashboardOrdenesView.as_view(), name='dashboard_ordenes'),
+    path('dashboard/', DashboardOrdenesView.as_view(), name='dashboard'),
 ]

@@ -20,14 +20,14 @@ def logoutUsuario(request):
 
 def login_view(request):
     if request.user.is_authenticated:
-        return redirect('core:home')  
+        return redirect('core:dashboard')  
 
     if request.method == 'POST':
         form = FormularioLogin(request, data=request.POST)
         if form.is_valid():
             user = form.get_user()
             auth_login(request, user)
-            return redirect('core:home')
+            return redirect('core:dashboard')
     else:
         form = FormularioLogin()
 

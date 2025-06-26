@@ -1,39 +1,42 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block content %}
 <div class="container d-flex justify-content-center align-items-center" style="min-height: 75vh;">
   <div class="card shadow p-4 rounded" style="min-width: 400px; max-width: 500px; width: 100%;">
-    <h3 class="text-center mb-4">Iniciar sesión</h3>
-    <form action="{% url 'usuarios:login' %}" method="post">
-      {% csrf_token %}
-      
-      {% if form.non_field_errors %}
-        <div class="alert alert-danger mb-3">
-          {% for error in form.non_field_errors %}
-            <p>{{ error }}</p>
-          {% endfor %}
-        </div>
-      {% endif %}
+    <div class="card-body">
+      <h3 class="text-center mb-4">Iniciar sesión</h3>
+      <form action="{% url 'usuarios:login' %}" method="post">
+        {% csrf_token %}
+        
+        {% if form.non_field_errors %}
+          <div class="alert alert-danger mb-3">
+            {% for error in form.non_field_errors %}
+              <p>{{ error }}</p>
+            {% endfor %}
+          </div>
+        {% endif %}
 
-      {% for field in form %}
-        <div class="form-group mb-3">
-          {{ field.label_tag }}
-          {{ field }}
-          {% if field.errors %}
-            <div class="text-danger">
-              {% for error in field.errors %}
-                <small>{{ error }}</small><br>
-              {% endfor %}
-            </div>
-          {% endif %}
-        </div>
-      {% endfor %}
+        {% for field in form %}
+          <div class="form-group mb-3">
+            {{ field.label_tag }}
+            {{ field }}
+            {% if field.errors %}
+              <div class="text-danger">
+                {% for error in field.errors %}
+                  <small>{{ error }}</small><br>
+                {% endfor %}
+              </div>
+            {% endif %}
+          </div>
+        {% endfor %}
 
-      <div class="d-grid gap-2 d-md-flex justify-content-md-between mt-3">
-        <button class="btn btn-primary btn-lg" name="submit">Log In</button>
-        <a href="{% url 'core:dashboard_ordenes' %}" class="btn btn-danger btn-lg">Cancelar</a>
-      </div>
-    </form>
+        <div class="d-grid gap-2 d-md-flex justify-content-md-between mt-3">
+          <button class="btn btn-primary btn-lg w-100" name="submit">Iniciar Sesion</button>
+          <!-- <a href="{ % url 'core:dashboard_ordenes' % }" class="btn btn-danger btn-lg">Cancelar</a> -->
+        </div>
+      </form>
+    </div>
   </div>
 </div>
 {% endblock %}
