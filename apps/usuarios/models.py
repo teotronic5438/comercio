@@ -1,44 +1,23 @@
 from django.contrib.auth.models import BaseUserManager,  AbstractBaseUser
 from django.db import models
-from django.core.exceptions import ValidationError
-
 
 class Roles(models.Model):
-    ROLES_PERMITIDOS = ['tecnico', 'administrativo', 'sistemas', 'supervisor']
-
     id = models.AutoField(primary_key=True)
     nombre = models.CharField(max_length=50)
 
     def __str__(self):
         return self.nombre
 
-    def clean(self):
-        if self.nombre.lower() not in self.ROLES_PERMITIDOS:
-            raise ValidationError({
-                'nombre': f"'{self.nombre}' no es un rol válido. Debe ser uno de: {', '.join(self.ROLES_PERMITIDOS)}"
-            })
-
-# class Roles(models.Model):
-#     id = models.AutoField(primary_key=True)
-#     nombre = models.CharField(max_length=50)
-
-#     def __str__(self):
-#         return self.nombre
-
 
 class UsuariosManager(BaseUserManager):
-    def create_user(self, email, username, nombre, apellido, rol,  password=None):
+    def create_user(self, email, username, nombre, apellido, rol=None,  password=None):
         if not email:
-            raise ValueError("Usuario tiene que tenr un email")
+            raise ValueError("Usuario tiene que tener un email")
         
-        #busca y convierte el int ingresado a una istancia de objeto Rol
-        #permite crear por consola el superuser con el campo rol indicando el ID
-        if isinstance(rol, int):
-            try:
-                rol = Roles.objects.get(pk=rol)
-            except Roles.DoesNotExist:
-                raise ValueError(f"No existe un rol con ID {rol}.")
-            
+        # Si no se pasa un rol, asignar uno por defecto
+        if rol is None:
+            rol, creado = Roles.objects.get_or_create(nombre="Administrativo")  # Rol por defecto
+
         usuario = self.model(
             username = username,
             email=self.normalize_email(email),
@@ -53,7 +32,11 @@ class UsuariosManager(BaseUserManager):
     
     
     
-    def create_superuser(self, username, email, nombre, apellido, rol, password):
+    def create_superuser(self, username, email, nombre, apellido, password, rol=None):
+
+        if rol is None:
+            rol, _ = Roles.objects.get_or_create(nombre="Admin")
+
         usuario = self.create_user(
             email = email,
             username= username,
@@ -74,21 +57,23 @@ class UsuariosManager(BaseUserManager):
 
 
 class Usuarios(AbstractBaseUser):
-    
     username = models.CharField('Nombre de usuario', unique= True, max_length=60)
     email = models.EmailField('Correo electronico', max_length=254, unique= True)
     nombre = models.CharField(max_length=50)
     apellido = models.CharField(max_length=50)
-    rol = models.ForeignKey( Roles, on_delete=models.CASCADE)
-    #rol = models.CharField(max_length=20)
+    #rol = models.ForeignKey(Roles, on_delete=models.CASCADE)
+    # rol = models.CharField(max_length=20)
+    rol = models.ForeignKey(Roles, on_delete=models.CASCADE)
     activo = models.BooleanField(default=True)
     is_admin = models.BooleanField(default = False)
     is_superuser = models.BooleanField(default=False)
     is_staff = models.BooleanField(default=False)
+   
+
     objects = UsuariosManager()
      
     USERNAME_FIELD = 'username' 
-    REQUIRED_FIELDS = ['nombre', 'apellido', 'rol', 'email'] #campos necesarios para crear la cuenta por consola
+    REQUIRED_FIELDS = ['nombre', 'apellido', 'email'] #campos necesarios para crear la cuenta por consola
 
     def __str__(self):
         return f"{self.nombre} {self.apellido} ({self.username})"
@@ -98,11 +83,7 @@ class Usuarios(AbstractBaseUser):
     
     def has_module_perms(self, app_label):
         return True
-    
-    def get_rol(self):
-        return self.rol   
-    
-    
+
 """
 class Roles(models.Model):
     id = models.AutoField(primary_key=True)

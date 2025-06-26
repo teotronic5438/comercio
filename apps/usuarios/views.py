@@ -1,19 +1,21 @@
 from django.shortcuts import render, redirect
+from django.http import HttpResponseRedirect
 from django.contrib import messages
 from django.urls import reverse_lazy
 #from django.utils.decorators import method_decorator
 #from django.views.decorators.cache import never_cache
 #from django.views.decorators.csrf import csrf_protect
 from .forms import FormularioLogin, FormularioUsuario
-from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth import login as auth_login, authenticate, logout
 from django.views.generic.edit import FormView, CreateView
-from django.contrib.auth.views import LoginView, LogoutView
-from .models import Usuarios
-from django.views import View
+from django.contrib.auth.views import LoginView
+from .models import Usuarios, Roles
 
-class LogoutUsuarioView(LoginRequiredMixin, LogoutView):
-    next_page = '/usuarios/login/'
+
+
+def logoutUsuario(request):
+     logout(request)
+     return HttpResponseRedirect('/usuarios/login/')  #ex: return HttpResponseRedirect('usuarios:login')
 
 
 def login_view(request):
@@ -32,7 +34,7 @@ def login_view(request):
     return render(request, 'usuarios/login.html', {'form': form})
 
     
-class Usuario(CreateView):
+class RegistrarUsuario(CreateView):
       model = Usuarios
       form_class = FormularioUsuario
       template_name = 'usuarios/register.html'
@@ -41,12 +43,14 @@ class Usuario(CreateView):
       def post(self, request, *args, **kwargs):
             form = self.form_class(request.POST)
             if form.is_valid():
+                  # Asignar un rol por defecto (ej: "Usuario")
+                  rol, _ = Roles.objects.get_or_create(nombre="Administrativo")
                   nuevo_usuario = Usuarios(
                         email = form.cleaned_data.get('email'),
                         username = form.cleaned_data.get('username'), 
                         nombre = form.cleaned_data.get('nombre'),
                         apellido = form.cleaned_data.get('apellido'),
-                        rol = form.cleaned_data.get('rol'),
+                        rol = rol
                   )
                   nuevo_usuario.set_password(form.cleaned_data.get('password1'))
                   nuevo_usuario.save()
@@ -54,14 +58,6 @@ class Usuario(CreateView):
                   return redirect('core:home')
             else:
                   return render(request, self.template_name, {'form': form})
-  
-  
- 
-
-# def logoutUsuario(request):
-#      logout(request)
-#      return HttpResponseRedirect('/usuarios/login/')  #ex: return HttpResponseRedirect('usuarios:login')
- 
       
 """
 

@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth import authenticate
-from .models import Usuarios, Roles
+from .models import Usuarios
 
 
 class FormularioLogin(AuthenticationForm):
@@ -34,12 +34,10 @@ class FormularioUsuario(forms.ModelForm):
         'required': 'required',
         }
     ))
-    
-   
 
     class Meta: 
         model = Usuarios
-        fields = ('email', 'username', 'nombre', 'apellido', 'rol')
+        fields = ('email', 'username', 'nombre', 'apellido')
         widgets = {
             'email': forms.EmailInput(
                 attrs= {
@@ -73,16 +71,6 @@ class FormularioUsuario(forms.ModelForm):
                 }
             )
         }
-    
-    rol = forms.ModelChoiceField(
-        queryset=Roles.objects.all(),
-        empty_label="Seleccione un rol",
-        label="Rol del usuario",
-        widget=forms.Select(attrs={'class': 'form-select'})
-    )    
-        
-        
-        
     def clean_password2(self):  #validacion de contraseña del form personalizado
         password1 = self.cleaned_data.get('password1')
         password2 = self.cleaned_data.get('password2')
@@ -93,6 +81,13 @@ class FormularioUsuario(forms.ModelForm):
     def save(self, commit = True):
         user = super().save(commit= False)
         user.set_password(self.cleaned_data['password1'])
+
+        # Asignar rol por defecto si no se definió
+        if not user.rol_id:
+            from .models import Roles
+            rol, _ = Roles.objects.get_or_create(nombre="Administrativo")
+            user.rol = rol
+
         if commit:
             user.save()
         return user
