@@ -5,11 +5,11 @@ from django.contrib import messages
 from django.utils.timezone import now
 from django.views import View
 from apps.ordenes.models import Ordenes, Estados, Destinos
-from django.db.models import Q, Count # <-- Importamos Count directamente aquí también
-from django.urls import reverse
 from apps.despachos.models import Pallet, DetallePallet
+from django.db.models import Q, Count
+from django.urls import reverse
 from collections import defaultdict
-from django.db import models # <-- ¡IMPORTACIÓN CRUCIAL AÑADIDA!
+from django.db import transaction
 
 # --- CLASE-BASADA EN VISTA BASE (Para reutilizar lógica común de filtrado y búsqueda en vistas de visualización de pallets) ---
 class BaseOrdenesDespachoView(View):
@@ -30,21 +30,20 @@ class BaseOrdenesDespachoView(View):
             messages.error(self.request, f"El destino '{self.destino_base_nombre}' no está configurado en la base de datos (modelo Destinos). Por favor, créalo en el panel de administración.")
             return Ordenes.objects.none()
 
-        # Filtrar órdenes que están en estado 'Palletizado' y en el destino base,
-        # y cuyo PALLET NO esté en estado 'Despachado'.
         queryset = Ordenes.objects.filter(
             estado_id=estado_palletizado_obj,
             destino=destino_obj,
-            detalle_pallet__pallet__isnull=False # Asegura que la orden esté en un pallet
+            detalle_pallet_asociado__pallet__isnull=False
         )
 
         if estado_despachado_pallet_obj:
-            queryset = queryset.exclude(detalle_pallet__pallet__estado_pallet=estado_despachado_pallet_obj)
+            queryset = queryset.exclude(detalle_pallet_asociado__pallet__estado_pallet=estado_despachado_pallet_obj)
 
         queryset = queryset.select_related(
             'destino', 'equipo_id', 'equipo_id__producto_id', 'estado_id',
-            'detalle_pallet', 'detalle_pallet__pallet', 'detalle_pallet__pallet__estado_pallet'
-        ).order_by('detalle_pallet__pallet__nro_pallet', 'fecha_creacion')
+            'detalle_pallet_asociado__pallet__estado_pallet', 'detalle_pallet_asociado__pallet__destino', 
+            'usuario', 'editado_por', 'palletizado_por'
+        ).order_by('detalle_pallet_asociado__pallet__nro_pallet', 'fecha_creacion')
 
         return queryset
 
@@ -55,28 +54,30 @@ class BaseOrdenesDespachoView(View):
             'destino': 'N/A',
             'fecha_creacion': None,
             'estado_pallet': 'N/A',
-            'ordenes': []
+            'ordenes': [],
+            'usuario_creacion_pallet': 'N/A' 
         })
 
         for orden in queryset:
             equipo_obj = orden.equipo_id
-            producto_obj = equipo_obj.producto_id if equipo_obj else None
+            
+            producto_obj = getattr(equipo_obj, 'producto_id', None)
+            producto_modelo = getattr(producto_obj, 'modelo', 'N/A')
+            producto_marca = getattr(producto_obj, 'marca', 'N/A')
 
-            producto_modelo = producto_obj.modelo if producto_obj and hasattr(producto_obj, 'modelo') else 'N/A'
-            producto_marca = producto_obj.marca if producto_obj and hasattr(producto_obj, 'marca') else 'N/A'
+            nombre_destino = getattr(orden.destino, 'nombre_destino', 'Sin asignar')
+            nombre_estado = getattr(orden.estado_id, 'nombre_estado', 'Sin estado')
 
-            nombre_destino = orden.destino.nombre_destino if orden.destino else 'Sin asignar'
-            nombre_estado = orden.estado_id.nombre_estado if orden.estado_id else 'Sin estado'
-
-            if hasattr(orden, 'detalle_pallet') and orden.detalle_pallet and orden.detalle_pallet.pallet:
-                pallet_obj = orden.detalle_pallet.pallet
+            if hasattr(orden, 'detalle_pallet_asociado') and orden.detalle_pallet_asociado and orden.detalle_pallet_asociado.pallet:
+                pallet_obj = orden.detalle_pallet_asociado.pallet
                 pallet_id = pallet_obj.id
                 pallet_info = {
                     'id': pallet_obj.id,
                     'nro_pallet': pallet_obj.nro_pallet,
-                    'destino': pallet_obj.destino.nombre_destino if pallet_obj.destino else 'N/A',
+                    'destino': getattr(pallet_obj.destino, 'nombre_destino', 'N/A'),
                     'fecha_creacion': pallet_obj.fecha_creacion,
-                    'estado_pallet': pallet_obj.estado_pallet.nombre_estado if pallet_obj.estado_pallet else 'N/A',
+                    'estado_pallet': getattr(pallet_obj.estado_pallet, 'nombre_estado', 'N/A'),
+                    'usuario_creacion_pallet': getattr(pallet_obj.usuario, 'username', 'N/A')
                 }
 
                 if pallets_agrupados[pallet_id]['id'] is None:
@@ -84,7 +85,7 @@ class BaseOrdenesDespachoView(View):
 
                 pallets_agrupados[pallet_id]['ordenes'].append({
                     'id': orden.id,
-                    'numero_serie': equipo_obj.numero_serie if equipo_obj else 'N/A',
+                    'numero_serie': getattr(equipo_obj, 'numero_serie', 'N/A'),
                     'modelo': producto_modelo,
                     'marca': producto_marca,
                     'fecha_creacion': orden.fecha_creacion,
@@ -146,7 +147,10 @@ class OrdenesRevisadasView(View):
                 'titulo_pagina': 'Órdenes Revisadas',
             })
 
-        ordenes_queryset = Ordenes.objects.filter(estado_id=estado_revisado_obj).select_related(
+        ordenes_queryset = Ordenes.objects.filter(
+            estado_id=estado_revisado_obj,
+            equipo_palletizado=False # Solo órdenes revisadas que AÚN NO estén palletizadas
+        ).select_related(
             'destino', 'equipo_id', 'equipo_id__producto_id', 'estado_id'
         ).order_by('-fecha_creacion')
 
@@ -172,18 +176,18 @@ class OrdenesRevisadasView(View):
         if ordenes_queryset.exists():
             for orden in ordenes_queryset:
                 equipo_obj = orden.equipo_id
-                producto_obj = equipo_obj.producto_id if equipo_obj else None
+                producto_obj = getattr(equipo_obj, 'producto_id', None)
 
-                producto_modelo = producto_obj.modelo if producto_obj and hasattr(producto_obj, 'modelo') else 'N/A'
-                producto_marca = producto_obj.marca if producto_obj and hasattr(producto_obj, 'marca') else 'N/A'
+                producto_modelo = getattr(producto_obj, 'modelo', 'N/A')
+                producto_marca = getattr(producto_obj, 'marca', 'N/A')
 
-                nombre_destino = orden.destino.nombre_destino if orden.destino else 'Sin asignar'
-                nombre_estado = orden.estado_id.nombre_estado if orden.estado_id else 'Sin estado'
+                nombre_destino = getattr(orden.destino, 'nombre_destino', 'Sin asignar')
+                nombre_estado = getattr(orden.estado_id, 'nombre_estado', 'Sin estado')
 
                 datos_ordenes.append({
                     'id': orden.id,
-                    'equipo_id': orden.equipo_id,
-                    'numero_serie': equipo_obj.numero_serie if equipo_obj else 'N/A',
+                    'equipo_id': orden.equipo_id.id if orden.equipo_id else None,
+                    'numero_serie': getattr(equipo_obj, 'numero_serie', 'N/A'),
                     'modelo': producto_modelo,
                     'marca': producto_marca,
                     'fecha_creacion': orden.fecha_creacion,
@@ -203,130 +207,130 @@ class OrdenesRevisadasView(View):
             'filtro_destino_seleccionado': filtro_destino_param,
             'destinos_para_filtro': Destinos.objects.all().order_by('nombre_destino'),
             'destinos_para_despacho': destinos_para_despacho,
-            'mostrar_boton_despacho': bool(datos_ordenes),
+            'mostrar_boton_despacho': bool(datos_ordenes), 
             'titulo_pagina': 'Órdenes Revisadas',
+            'max_items_pallet': 15,
         }
         return render(request, self.template_name, context)
 
 
-# --- CLASE-BASADA EN VISTA PARA PROCESAR EL CAMBIO DE ESTADO/DESTINO (desde Revisadas) ---
 class ProcesarDespachoOrdenesView(View):
     def post(self, request, *args, **kwargs):
         ordenes_ids = request.POST.getlist('orden_ids')
         destino_id = request.POST.get('destino_id_despacho')
-        MAX_ITEMS_PER_PALLET = 15 # Definimos el límite aquí
+        MAX_ITEMS_PER_PALLET = 15
 
         if not ordenes_ids:
             messages.error(request, "No se seleccionó ninguna orden para palletizar.")
             return redirect('despachos:ordenes_revisadas')
 
-        # Si se seleccionan más órdenes de la cuenta, informamos al usuario, pero la lógica de 15 por pallet
-        # se manejará internamente si se seleccionan más de 15.
-        if len(ordenes_ids) > MAX_ITEMS_PER_PALLET:
-            messages.warning(request, f"Se seleccionaron {len(ordenes_ids)} órdenes. Se distribuirán en pallets de hasta {MAX_ITEMS_PER_PALLET} ítems cada uno.")
-
         if not destino_id:
             messages.error(request, "No se seleccionó ningún destino para el pallet.")
             return redirect('despachos:ordenes_revisadas')
 
-        try:
-            destino_obj = get_object_or_404(Destinos, id=destino_id)
-            estado_palletizado_obj = get_object_or_404(Estados, nombre_estado__iexact='palletizado')
-            estado_revisado_obj = get_object_or_404(Estados, nombre_estado__iexact='revisado')
-            estado_despachado_obj = Estados.objects.filter(nombre_estado__iexact='despachado').first() # Necesario para excluir pallets despachados
+        with transaction.atomic():
+            try:
+                destino_obj = get_object_or_404(Destinos, id=destino_id)
+                estado_palletizado_obj = get_object_or_404(Estados, nombre_estado__iexact='palletizado')
+                estado_revisado_obj = get_object_or_404(Estados, nombre_estado__iexact='revisado')
+                estado_despachado_obj = Estados.objects.filter(nombre_estado__iexact='despachado').first()
 
-            current_pallet = None # Pallet actual en el que se están agregando órdenes
-            updated_count = 0
-            pallets_creados_o_actualizados = set() # Para llevar un registro de los pallets afectados
+                current_pallet = None
+                updated_count = 0
+                pallets_creados_o_actualizados = set()
 
-            for orden_id in ordenes_ids:
-                try:
-                    orden = Ordenes.objects.get(id=orden_id)
+                for orden_id in ordenes_ids:
+                    try:
+                        orden = Ordenes.objects.get(id=orden_id)
 
-                    if orden.estado_id != estado_revisado_obj:
-                        messages.warning(request, f"La orden con ID {orden_id} no está en estado 'Revisado' y no pudo ser palletizada. Su estado actual es: {orden.estado_id.nombre_estado}.")
-                        continue
+                        if orden.estado_id != estado_revisado_obj:
+                            messages.warning(request, f"La orden con ID {orden_id} no está en estado 'Revisado' y no pudo ser procesada.")
+                            continue
 
-                    # Buscar un pallet "activo" (no despachado) para este destino
-                    # que tenga menos de MAX_ITEMS_PER_PALLET órdenes.
-                    # Excluir pallets que estén en estado 'despachado'
-                    active_pallets_for_destination_qs = Pallet.objects.filter(
-                        destino=destino_obj
-                    ).annotate(
-                        item_count=Count('detalles') # Usa Count directamente si ya está importado
-                    ).filter(
-                        item_count__lt=MAX_ITEMS_PER_PALLET # Que tenga menos de 15 ítems
-                    ).order_by('fecha_creacion') # Priorizamos el más antiguo con espacio
+                        detalle_pallet_exists = DetallePallet.objects.filter(orden_id=orden).exists()
 
-                    if estado_despachado_obj:
-                        active_pallets_for_destination_qs = active_pallets_for_destination_qs.exclude(
-                            estado_pallet=estado_despachado_obj
+                        if detalle_pallet_exists:
+                            if not orden.equipo_palletizado:
+                                orden.equipo_palletizado = True
+                                orden._request = request
+                                orden.save()
+                                messages.info(request, f"Se corrigió la orden {orden_id}: Marcada como palletizada ya que se encontró asociada a un pallet.")
+                            messages.warning(request, f"La orden con ID {orden_id} ya está asociada a un pallet y no pudo ser re-procesada.")
+                            continue
+
+                        # Validar que el destino asignado coincida con el seleccionado
+                        if orden.destino and orden.destino != destino_obj:
+                            messages.warning(request, f"La orden con ID {orden_id} no se cargó al pallet porque el destino seleccionado ('{destino_obj}') no coincide con el asignado ('{orden.destino}').")
+                            continue
+
+                        active_pallets_for_destination_qs = Pallet.objects.filter(
+                            destino=destino_obj
+                        ).annotate(
+                            item_count=Count('detalles')
+                        ).filter(
+                            item_count__lt=MAX_ITEMS_PER_PALLET
+                        ).order_by('fecha_creacion')
+
+                        if estado_despachado_obj:
+                            active_pallets_for_destination_qs = active_pallets_for_destination_qs.exclude(
+                                estado_pallet=estado_despachado_obj
+                            )
+
+                        active_pallet_with_space = active_pallets_for_destination_qs.first()
+
+                        if not current_pallet or current_pallet.detalles.count() >= MAX_ITEMS_PER_PALLET:
+                            if active_pallet_with_space:
+                                current_pallet = active_pallet_with_space
+                            else:
+                                last_pallet = Pallet.objects.order_by('-id').first()
+                                next_pallet_number = 1
+                                if last_pallet and last_pallet.nro_pallet and last_pallet.nro_pallet.isdigit():
+                                    next_pallet_number = int(last_pallet.nro_pallet) + 1
+                                generated_nro_pallet = str(next_pallet_number).zfill(4)
+
+                                current_pallet = Pallet.objects.create(
+                                    nro_pallet=generated_nro_pallet,
+                                    destino=destino_obj,
+                                    estado_pallet=estado_palletizado_obj,
+                                    usuario=request.user,
+                                )
+                                messages.info(request, f"Se ha creado un nuevo pallet: Nro. {current_pallet.nro_pallet} para el destino '{destino_obj.nombre_destino}'.")
+
+                        DetallePallet.objects.create(
+                            pallet=current_pallet,
+                            orden_id=orden,
                         )
 
-                    active_pallet_with_space = active_pallets_for_destination_qs.first()
+                        orden.estado_id = estado_palletizado_obj
+                        orden.equipo_palletizado = True
+                        orden._request = request
+                        orden.save()
+                        updated_count += 1
+                        pallets_creados_o_actualizados.add(current_pallet.id)
+
+                    except Ordenes.DoesNotExist:
+                        messages.warning(request, f"La orden con ID {orden_id} no existe y no pudo ser procesada.")
+                    except Exception as e:
+                        messages.error(request, f"Error al procesar orden {orden_id} para pallet: {e}")
+
+                if updated_count > 0:
+                    messages.success(request, f"{updated_count} órdenes fueron distribuidas en {len(pallets_creados_o_actualizados)} pallet(s) para destino '{destino_obj.nombre_destino}'.")
+                else:
+                    messages.info(request, "No se procesó ninguna orden para palletizar. Asegúrate de que estén en estado 'Revisado', no palletizadas y con el destino correcto.")
+
+                return redirect('despachos:ordenes_revisadas')
+
+            except Destinos.DoesNotExist:
+                messages.error(request, "El destino de pallet seleccionado no es válido. Asegúrate de que exista en tu base de datos.")
+                return redirect('despachos:ordenes_revisadas')
+            except Estados.DoesNotExist as e:
+                messages.error(request, f"Uno de los estados requeridos no está configurado en la base de datos: {e}. Por favor, créalos en el panel de administración de Django.")
+                return redirect('despachos:ordenes_revisadas')
+            except Exception as e:
+                messages.error(request, f"Ocurrió un error general al procesar el pallet: {e}")
+                return redirect('despachos:ordenes_revisadas')
 
 
-                    if not current_pallet or current_pallet.detalles.count() >= MAX_ITEMS_PER_PALLET:
-                        # Si no hay pallet actual, o el actual está lleno, buscamos uno existente o creamos uno nuevo.
-                        if active_pallet_with_space:
-                            current_pallet = active_pallet_with_space
-                        else:
-                            # Si no se encuentra un pallet activo con espacio, crear uno nuevo
-                            last_pallet = Pallet.objects.order_by('-id').first()
-                            next_pallet_number = 1
-                            if last_pallet and last_pallet.nro_pallet and last_pallet.nro_pallet.isdigit():
-                                next_pallet_number = int(last_pallet.nro_pallet) + 1
-                            generated_nro_pallet = str(next_pallet_number).zfill(4)
-
-                            current_pallet = Pallet.objects.create(
-                                destino=destino_obj,
-                                fecha_creacion=now(),
-                                nro_pallet=generated_nro_pallet,
-                                usuario_id=request.user if request.user.is_authenticated else None,
-                                estado_pallet=estado_palletizado_obj,
-                            )
-                            messages.info(request, f"Se ha creado un nuevo pallet: Nro. {current_pallet.nro_pallet} para el destino '{destino_obj.nombre_destino}'.")
-
-                    # 2. Crear DetallePallet para la orden actual en el current_pallet
-                    DetallePallet.objects.create(
-                        pallet=current_pallet,
-                        orden_id=orden,
-                        modelo=orden.equipo_id.producto_id.modelo if orden.equipo_id and orden.equipo_id.producto_id else 'N/A',
-                        serial=orden.equipo_id.numero_serie if orden.equipo_id else 'N/A',
-                        cantidad=1,
-                    )
-
-                    # 3. Actualizar el estado de la Orden a 'Palletizado'
-                    orden.estado_id = estado_palletizado_obj
-                    orden.destino = destino_obj # Aseguramos que la orden tenga el destino del pallet
-                    orden.save()
-                    updated_count += 1
-                    pallets_creados_o_actualizados.add(current_pallet.id) # Registramos el pallet afectado
-
-                except Ordenes.DoesNotExist:
-                    messages.warning(request, f"La orden con ID {orden_id} no existe y no pudo ser procesada.")
-                except Exception as e:
-                    messages.error(request, f"Error al procesar orden {orden_id} para pallet: {e}")
-
-            if updated_count > 0:
-                messages.success(request, f"{updated_count} órdenes fueron distribuidas en {len(pallets_creados_o_actualizados)} pallet(s) para destino '{destino_obj.nombre_destino}'.")
-            else:
-                messages.info(request, "No se procesó ninguna orden para palletizar. Asegúrate de que estén en estado 'Revisado'.")
-
-            return redirect('despachos:ordenes_revisadas')
-
-        except Destinos.DoesNotExist:
-            messages.error(request, "El destino de pallet seleccionado no es válido. Asegúrate de que exista en tu base de datos.")
-            return redirect('despachos:ordenes_revisadas')
-        except Estados.DoesNotExist as e:
-            messages.error(request, f"Uno de los estados requeridos no está configurado en la base de datos: {e}. Por favor, créalos en el panel de administración de Django.")
-            return redirect('despachos:ordenes_revisadas')
-        except Exception as e:
-            messages.error(request, f"Ocurrió un error general al procesar el pallet: {e}")
-            return redirect('despachos:ordenes_revisadas')
-
-
-# --- VISTA PARA PROCESAR EL DESPACHO DE UN PALLET COMPLETO ---
 class ProcesarDespachoPalletView(View):
     def post(self, request, *args, **kwargs):
         pallet_id = request.POST.get('pallet_id_a_despachar')
@@ -334,43 +338,46 @@ class ProcesarDespachoPalletView(View):
             messages.error(request, "No se recibió el ID del pallet a despachar.")
             return redirect(request.META.get('HTTP_REFERER', '/'))
 
-        try:
-            pallet = get_object_or_404(Pallet, id=pallet_id)
+        with transaction.atomic():
+            try:
+                pallet = get_object_or_404(Pallet, id=pallet_id)
 
-            estado_despachado_pallet_obj = Estados.objects.filter(nombre_estado__iexact='despachado').first()
-            if not estado_despachado_pallet_obj:
-                messages.error(request, "El estado 'Despachado' para pallets no está configurado en la base de datos (modelo Estados). Por favor, créalo.")
-                return redirect(request.META.get('HTTP_REFERER', '/'))
+                estado_despachado_pallet_obj = Estados.objects.filter(nombre_estado__iexact='despachado').first()
+                if not estado_despachado_pallet_obj:
+                    messages.error(request, "El estado 'Despachado' para pallets no está configurado en la base de datos (modelo Estados). Por favor, créalo.")
+                    return redirect(request.META.get('HTTP_REFERER', '/'))
 
-            estado_despachado_orden_obj = Estados.objects.filter(nombre_estado__iexact='despachado').first()
-            if not estado_despachado_orden_obj:
-                messages.warning(request, "El estado 'Despachado' para órdenes no está configurado. Las órdenes no cambiarán de estado.")
+                estado_despachado_orden_obj = Estados.objects.filter(nombre_estado__iexact='despachado').first()
+                if not estado_despachado_orden_obj:
+                    messages.warning(request, "El estado 'Despachado' para órdenes no está configurado. Las órdenes no cambiarán de estado a 'Despachado'.")
 
-            # Actualizar el estado del Pallet
-            pallet.estado_pallet = estado_despachado_pallet_obj
-            pallet.fecha_despacho = now()
-            pallet.usuario_id = request.user if request.user.is_authenticated else None # Asigna el usuario que despacha
-            pallet.save()
+                pallet.estado_pallet = estado_despachado_pallet_obj
+                pallet.fecha_despacho = now()
+                pallet.usuario_despacho = request.user if request.user.is_authenticated else None
+                pallet._request = request
+                pallet.save()
 
-            # Actualizar el estado de TODAS las órdenes dentro de este Pallet
-            ordenes_actualizadas_count = 0
-            for detalle_pallet in pallet.detalles.all():
-                orden = detalle_pallet.orden_id
-                if orden and estado_despachado_orden_obj:
-                    orden.estado_id = estado_despachado_orden_obj
-                    orden.save()
-                    ordenes_actualizadas_count += 1
+                ordenes_actualizadas_count = 0
+                for detalle_pallet in pallet.detalles.all():
+                    orden = detalle_pallet.orden_id
+                    if orden:
+                        if estado_despachado_orden_obj:
+                            orden.estado_id = estado_despachado_orden_obj
+                        orden.orden_activa = False
+                        orden._request = request
+                        orden.save()
+                        ordenes_actualizadas_count += 1
 
-            messages.success(request, f"Pallet {pallet.nro_pallet} despachado exitosamente. Se actualizaron {ordenes_actualizadas_count} órdenes.")
+                messages.success(request, f"Pallet {pallet.nro_pallet} despachado exitosamente. Se actualizaron {ordenes_actualizadas_count} órdenes.")
 
-        except Pallet.DoesNotExist:
-            messages.error(request, f"El pallet con ID {pallet_id} no existe.")
-        except Estados.DoesNotExist:
-            messages.error(request, "Error: Uno o ambos estados ('Despachado' para pallet u orden) no encontrados en la base de datos.")
-        except Exception as e:
-            messages.error(request, f"Ocurrió un error al despachar el pallet: {e}")
+            except Pallet.DoesNotExist:
+                messages.error(request, f"El pallet con ID {pallet_id} no existe.")
+            except Estados.DoesNotExist:
+                messages.error(request, "Error: Uno o ambos estados ('Despachado' para pallet u orden) no encontrados en la base de datos.")
+            except Exception as e:
+                messages.error(request, f"Ocurrió un error al despachar el pallet: {e}")
 
-        return redirect(request.META.get('HTTP_REFERER', '/'))
+            return redirect(request.META.get('HTTP_REFERER', '/'))
 
 
 # --- VISTAS PARA ÓRDENES CON ESTADO REVISADO Y UN DESTINO ESPECÍFICO (CON HISTORIAL) ---
@@ -379,9 +386,8 @@ class OrdenesNuevasView(BaseOrdenesDespachoView):
     titulo_pagina = 'Órdenes Nuevas Palletizadas'
 
     def get_context_data(self, request, queryset, mensaje_busqueda=None):
-        context = super().get_context_data(request, queryset, mensaje_busqueda) # Obtiene los pallets_activos
+        context = super().get_context_data(request, queryset, mensaje_busqueda)
 
-        # --- LÓGICA PARA EL HISTORIAL DE PALLETS DESPACHADOS DE ESTE DESTINO ---
         estado_despachado_obj = Estados.objects.filter(nombre_estado__iexact='despachado').first()
         destino_obj = Destinos.objects.filter(nombre_destino__iexact=self.destino_base_nombre).first()
 
@@ -391,7 +397,7 @@ class OrdenesNuevasView(BaseOrdenesDespachoView):
                 estado_pallet=estado_despachado_obj,
                 destino=destino_obj
             ).select_related(
-                'destino', 'estado_pallet', 'usuario_id', 'remito_salida'
+                'destino', 'estado_pallet', 'usuario', 'usuario_despacho', 'remito_salida'
             ).prefetch_related(
                 'detalles__orden_id__equipo_id__producto_id',
                 'detalles__orden_id__estado_id',
@@ -403,30 +409,36 @@ class OrdenesNuevasView(BaseOrdenesDespachoView):
                 for detalle_pallet in pallet.detalles.all():
                     orden = detalle_pallet.orden_id
                     if orden:
+                        equipo_obj = getattr(orden, 'equipo_id', None)
+                        producto_obj = getattr(equipo_obj, 'producto_id', None)
+
+                        modelo_nombre = getattr(producto_obj, 'modelo', 'N/A')
+                        marca_nombre = getattr(producto_obj, 'marca', 'N/A')
+
                         ordenes_en_pallet.append({
                             'id': orden.id,
-                            'numero_serie': orden.equipo_id.numero_serie if orden.equipo_id else 'N/A',
-                            'modelo': orden.equipo_id.producto_id.modelo if orden.equipo_id and orden.equipo_id.producto_id else 'N/A',
-                            'marca': orden.equipo_id.producto_id.marca if orden.equipo_id and orden.equipo_id.producto_id else 'N/A',
-                            'estado': orden.estado_id.nombre_estado if orden.estado_id else 'N/A',
+                            'numero_serie': getattr(equipo_obj, 'numero_serie', 'N/A'),
+                            'modelo': modelo_nombre,
+                            'marca': marca_nombre,
+                            'estado': getattr(orden.estado_id, 'nombre_estado', 'N/A'),
                         })
 
                 pallets_despachados.append({
                     'id': pallet.id,
                     'nro_pallet': pallet.nro_pallet,
-                    'destino': pallet.destino.nombre_destino if pallet.destino else 'N/A',
+                    'destino': getattr(pallet.destino, 'nombre_destino', 'N/A'),
                     'fecha_creacion': pallet.fecha_creacion,
                     'fecha_despacho': pallet.fecha_despacho,
-                    'estado_pallet': pallet.estado_pallet.nombre_estado,
-                    'usuario_despacho': pallet.usuario_id.username if pallet.usuario_id else 'N/A',
-                    'remito_salida': pallet.remito_salida.nro_remito if pallet.remito_salida else 'N/A',
+                    'estado_pallet': getattr(pallet.estado_pallet, 'nombre_estado', 'N/A'),
+                    'usuario_creacion': getattr(pallet.usuario, 'username', 'N/A'),
+                    'usuario_despacho': getattr(pallet.usuario_despacho, 'username', 'N/A'),
+                    'remito_salida': getattr(pallet.remito_salida, 'nro_remito', 'N/A'),
                     'cantidad_ordenes': len(ordenes_en_pallet),
                     'ordenes': ordenes_en_pallet,
                 })
 
         context['pallets_despachados'] = pallets_despachados
         context['titulo_historial'] = f"Historial de Pallets Despachados a {self.destino_base_nombre.capitalize()}"
-        # --- FIN LÓGICA HISTORIAL ---
 
         return context
 
