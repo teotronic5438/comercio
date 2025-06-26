@@ -10,6 +10,8 @@ from django.utils.timezone import now
 from django.urls import reverse_lazy
 from django.core.paginator import Paginator
 from .forms import EquipoForm
+from django.contrib.auth.mixins import LoginRequiredMixin
+
 
 ''' # vista anterior en funcion 
 # Create your views here.
@@ -75,7 +77,7 @@ def revisar_orden(request, orden_id):
 
 '''
 
-class OrdenesPendientesListView(ListView):
+class OrdenesPendientesListView(LoginRequiredMixin, ListView):
     model = Ordenes
     template_name = 'ordenes/ordenes_pendientes.html'
     context_object_name = 'ordenes'
@@ -130,7 +132,7 @@ class OrdenesPendientesListView(ListView):
         
 #         return super().form_valid(form)
     
-class RevisarOrdenUpdateView(UpdateView):
+class RevisarOrdenUpdateView(LoginRequiredMixin, UpdateView):
     model = Ordenes
     fields = ['falla_detectada', 'reparacion', 'destino']
     template_name = 'ordenes/revisar_orden.html'
@@ -168,7 +170,7 @@ class RevisarOrdenUpdateView(UpdateView):
 
 
 # creando solo ordenes activas de prueba
-class OrdenesActivasListView(ListView):
+class OrdenesActivasListView(LoginRequiredMixin, ListView):
     model = Ordenes
     template_name = 'ordenes/ordenes_activas.html'
     context_object_name = 'ordenes'

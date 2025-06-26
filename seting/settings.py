@@ -25,6 +25,8 @@ SECRET_KEY = 'django-insecure-t!yonzm(stwf)jg!*-pfuanou%o!6mt*c45k^e1ufc=#=wbzwt
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost']  # Necesario si estás en local
+
 
 ALLOWED_HOSTS = []
 
@@ -147,7 +149,7 @@ REST_FRAMEWORK = {
 
 
 
-
+# Para proteccion de rutas si no esta logeado lo saca del sitio
 LOGIN_REDIRECT_URL = 'core:home'
 LOGOUT_REDIRECT_URL = 'usuarios:login'
 LOGIN_URL = 'usuarios:login'
