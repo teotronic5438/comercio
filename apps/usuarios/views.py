@@ -38,7 +38,7 @@ class RegistrarUsuario(CreateView):
       model = Usuarios
       form_class = FormularioUsuario
       template_name = 'usuarios/register.html'
-      success_url = reverse_lazy('core:home')
+      success_url = reverse_lazy('core:dashboard')
       
       def post(self, request, *args, **kwargs):
             form = self.form_class(request.POST)
