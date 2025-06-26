@@ -1,22 +1,19 @@
 from django.shortcuts import render, redirect
-from django.http import HttpResponseRedirect
 from django.contrib import messages
 from django.urls import reverse_lazy
 #from django.utils.decorators import method_decorator
 #from django.views.decorators.cache import never_cache
 #from django.views.decorators.csrf import csrf_protect
 from .forms import FormularioLogin, FormularioUsuario
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth import login as auth_login, authenticate, logout
 from django.views.generic.edit import FormView, CreateView
-
-from django.contrib.auth.views import LoginView
+from django.contrib.auth.views import LoginView, LogoutView
 from .models import Usuarios
+from django.views import View
 
-
-
-def logoutUsuario(request):
-     logout(request)
-     return HttpResponseRedirect('/usuarios/login/')  #ex: return HttpResponseRedirect('usuarios:login')
+class LogoutUsuarioView(LoginRequiredMixin, LogoutView):
+    next_page = '/usuarios/login/'
 
 
 def login_view(request):
@@ -35,7 +32,7 @@ def login_view(request):
     return render(request, 'usuarios/login.html', {'form': form})
 
     
-class RegistrarUsuario(CreateView):
+class Usuario(CreateView):
       model = Usuarios
       form_class = FormularioUsuario
       template_name = 'usuarios/register.html'
@@ -57,6 +54,14 @@ class RegistrarUsuario(CreateView):
                   return redirect('core:home')
             else:
                   return render(request, self.template_name, {'form': form})
+  
+  
+ 
+
+# def logoutUsuario(request):
+#      logout(request)
+#      return HttpResponseRedirect('/usuarios/login/')  #ex: return HttpResponseRedirect('usuarios:login')
+ 
       
 """
 
