@@ -11,6 +11,10 @@ from django.urls import reverse
 from collections import defaultdict
 from django.db import transaction
 
+# para actulizar stock
+from collections import defaultdict
+from apps.stock.models import StockProductos
+
 # --- CLASE-BASADA EN VISTA BASE (Para reutilizar lógica común de filtrado y búsqueda en vistas de visualización de pallets) ---
 class BaseOrdenesDespachoView(LoginRequiredMixin, View):
     template_name = 'despachos/ordenes_despacho_base.html'
@@ -343,6 +347,9 @@ class ProcesarDespachoPalletView(LoginRequiredMixin,View):
                 pallet = get_object_or_404(Pallet, id=pallet_id)
 
                 estado_despachado_pallet_obj = Estados.objects.filter(nombre_estado__iexact='despachado').first()
+
+
+
                 if not estado_despachado_pallet_obj:
                     messages.error(request, "El estado 'Despachado' para pallets no está configurado en la base de datos (modelo Estados). Por favor, créalo.")
                     return redirect(request.META.get('HTTP_REFERER', '/'))
@@ -356,6 +363,31 @@ class ProcesarDespachoPalletView(LoginRequiredMixin,View):
                 pallet.usuario_despacho = request.user if request.user.is_authenticated else None
                 pallet._request = request
                 pallet.save()
+                
+                # Agrupar productos por producto_id y contar cuántos hay de cada uno
+                productos_despachados = defaultdict(int)
+
+                for detalle_pallet in pallet.detalles.all():
+                    orden = detalle_pallet.orden_id
+                    if orden and orden.equipo_id and orden.equipo_id.producto_id:
+                        producto_id = orden.equipo_id.producto_id.id
+                        productos_despachados[producto_id] += 1
+                # para agrupar y controlar stock
+                
+
+                # Descontar del stock según los productos agrupados
+                for producto_id, cantidad_despachada in productos_despachados.items():
+                    # Si manejás un depósito específico, filtralo por depósito_id también
+                    stock_entry = StockProductos.objects.filter(producto_id=producto_id).first()
+                    if stock_entry:
+                        if stock_entry.cantidad_total >= cantidad_despachada:
+                            stock_entry.cantidad_total -= cantidad_despachada
+                            stock_entry.save()
+                        else:
+                            messages.warning(request, f"Stock insuficiente para el producto {stock_entry.producto_id}. Se necesitaban {cantidad_despachada}, pero hay {stock_entry.cantidad_total}.")
+                    else:
+                        messages.warning(request, f"No se encontró stock para el producto con ID {producto_id}.")
+
 
                 ordenes_actualizadas_count = 0
                 for detalle_pallet in pallet.detalles.all():

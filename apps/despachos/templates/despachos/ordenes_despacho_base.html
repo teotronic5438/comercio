@@ -138,7 +138,21 @@
                                     <td>{{ orden.numero_serie }}</td>
                                     <td>{{ orden.modelo }}</td>
                                     <td>{{ orden.marca }}</td>
-                                    <td><span class="badge-estado bg-{{ pallet.destino|lower|replace_chars:' :-' }}">{{ pallet.destino }}</span></td>
+                                    <!-- <td><span class="badge-estado bg-{ { pallet.destino|lower|replace_chars:' :-' } }">{ { pallet.destino } }</span></td> -->
+                                    <td>
+                                        {% if pallet.destino  == "Pendiente" %}
+                                            <span class="badge bg-warning">{{ pallet.destino  }}</span>
+                                        {% elif pallet.destino  == "Revisado" %}
+                                            <span class="badge bg-success">{{ pallet.destino  }}</span>
+                                        {% elif pallet.destino  == "Palletizado" %}
+                                            <span class="badge bg-primary">{{ pallet.destino }}</span>
+                                        {% elif pallet.destino  == "Despachado" %}
+                                            <span class="badge bg-secondary">{{ pallet.destino  }}</span>
+                                        {% else %}
+                                            <span class="badge bg-light text-dark">{{ pallet.destino  }}</span>
+                                        {% endif %}
+                                    </td>
+
                                     <td><span class="badge-estado bg-palletizado">Palletizado</span></td>
                                     <td>{{ pallet.fecha_creacion|date:"d/m/Y H:i" }}</td>
                                 </tr>

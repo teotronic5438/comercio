@@ -152,22 +152,23 @@ def aprobar_remito(request, pk):
 from apps.ordenes.models import get_estado_pendiente
 from django.db import transaction
 
+# la pk es la clave del remito
 def aprobar_remito(request, pk):
-    remito = get_object_or_404(Remitos, pk=pk)
+    remito = get_object_or_404(Remitos, pk=pk)  # obtenemos el remito con la clave pk
 
     if remito.aprobado:
-        return redirect('ingresos')
+        return redirect('ingresos')     # si la aprobo redirige a ingresos
 
-    with transaction.atomic():
-        remito.aprobado = True
+    with transaction.atomic():      # que los cambios se hagan juntos
+        remito.aprobado = True      # actualiza el campo aprobado del objeto remito
         remito.save()
 
         estado_pendiente = Estados.objects.get(pk=get_estado_pendiente())
         
-        remito_productos = RemitoProducto.objects.filter(remito_id=remito)
+        remito_productos = RemitoProducto.objects.filter(remito_id=remito)  # trae todos los productos que coincidam con el id remito
 
-        for rp in remito_productos:
-            producto = rp.producto_id
+        for rp in remito_productos:     # recorres con for in
+            producto = rp.producto_id       # por cada itearcion obtiene el id
             cantidad = rp.cantidad
             ## nota
             deposito = remito.deposito_id
