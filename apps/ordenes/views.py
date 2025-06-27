@@ -185,9 +185,17 @@ class OrdenesActivasListView(LoginRequiredMixin, ListView):
     #     ).order_by('-fecha_creacion')
     
     def get_queryset(self):
+        if not self.request.GET:
+            return Ordenes.objects.none()
+        
+        # queryset = Ordenes.objects.select_related(
+        #     'equipo_id__producto_id', 'estado_id', 'destino'
+        # ).filter(orden_activa=True)
+        
         queryset = Ordenes.objects.select_related(
             'equipo_id__producto_id', 'estado_id', 'destino'
-        ).filter(orden_activa=True)
+        ).all()
+
 
         # Filtros por GET
         estados = self.request.GET.getlist('estado')
