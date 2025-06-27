@@ -16,12 +16,13 @@ Este es el backend del sistema Enigma, un ERP modular desarrollado con Django y 
 ## ⚙️ Tecnologías utilizadas
 
 - Django (Python Web Framework)
-- Python
+- Python y vistas CBV
+- Herencia de Layout, archivos estaticos (CSS / JS)
 - HTML5 + Django Templates
 - SQLite3 (Base de datos)
-- ORM de Django
+- ORM de Django (CRUD)
+- Busqueda por multiples campos y filtros
 - Bootstrap (para diseño frontend)
-
 ---
 
 ## 🔄 Flujo principal del sistema
