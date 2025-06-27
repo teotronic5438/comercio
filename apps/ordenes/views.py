@@ -75,21 +75,29 @@ def revisar_orden(request, orden_id):
         'estados': estados,
         'destinos': destinos,
     })
-
+     
+    
 '''
 
 class OrdenesPendientesListView(LoginRequiredMixin, ListView):
     model = Ordenes
     template_name = 'ordenes/ordenes_pendientes.html'
     context_object_name = 'ordenes'
-    paginate_by = 12  # ✅ Paginación: 15 por página
+    paginate_by = 12    # ✅ Paginación: 12 por página
 
     def get_queryset(self):
-        return Ordenes.objects.select_related(
+        queryset = Ordenes.objects.select_related(
             'equipo_id__producto_id', 'estado_id'
-        ).filter(
-            estado_id__nombre_estado='Pendiente'
-        )
+        ).filter(estado_id__nombre_estado='Pendiente')
+
+        buscar = self.request.GET.get('buscar', '').strip()
+        if buscar:
+            queryset = queryset.filter(
+                models.Q(equipo_id__producto_id__modelo__icontains=buscar) |
+                models.Q(equipo_id__producto_id__marca__icontains=buscar)
+            )
+
+        return queryset
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -105,8 +113,11 @@ class OrdenesPendientesListView(LoginRequiredMixin, ListView):
             })
 
         context['ordenes'] = datos_ordenes
-        context['total_ordenes'] = self.get_queryset().count()  # ✅ Total de órdenes pendientes
+        context['total_ordenes'] = Ordenes.objects.filter(estado_id__nombre_estado='Pendiente').count()  
+        # ✅ Total de órdenes pendientes
+        context['buscar'] = self.request.GET.get('buscar', '')
         return context
+
 
 # class RevisarOrdenUpdateView(UpdateView):
 #     model = Ordenes

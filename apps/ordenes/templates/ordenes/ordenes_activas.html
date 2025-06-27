@@ -95,9 +95,23 @@
                         {% widthratio t.seconds 3600 1 %} horas
                     {% endwith %}
                 </td>
-                <td>
+                <!-- <td>
                     <span class="badge bg-warning">{{ orden.estado }}</span>
+                </td> -->
+                <td>
+                    {% if orden.estado == "Pendiente" %}
+                        <span class="badge bg-warning">{{ orden.estado }}</span>
+                    {% elif orden.estado == "Revisado" %}
+                        <span class="badge bg-success">{{ orden.estado }}</span>
+                    {% elif orden.estado == "Palletizado" %}
+                        <span class="badge bg-primary">{{ orden.estado }}</span>
+                    {% elif orden.estado == "Despachado" %}
+                        <span class="badge bg-secondary">{{ orden.estado }}</span>
+                    {% else %}
+                        <span class="badge bg-light text-dark">{{ orden.estado }}</span>
+                    {% endif %}
                 </td>
+
             </tr>
             {% empty %}
             <tr>

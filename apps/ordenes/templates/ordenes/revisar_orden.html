@@ -68,10 +68,15 @@
             </label>
             {% render_field form.destino class="form-select" %}
         </div>
-
+        <!-- 
         <div class="text-end">
             <button type="submit" class="btn btn-success">Guardar Cambios</button>
+        </div> -->
+        <div class="text-end">
+            <a href="{{ request.META.HTTP_REFERER }}" class="btn btn-danger me-2">Cancelar</a>
+            <button type="submit" class="btn btn-success">Guardar Cambios</button>
         </div>
+
     </form>
 </div>
 {% endblock %}
