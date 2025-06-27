@@ -2,6 +2,38 @@
 
 Este es el backend del sistema Enigma, un ERP modular desarrollado con Django y Django REST Framework. Gestiona productos, equipos, remitos, órdenes de reparación, logística y stock.
 
+## 👨‍💻 Integrantes del equipo
+
+- Gonzalo Costas  
+- Néstor Díaz  
+- Ariel Iha  
+- José Moya  
+- Elías Orihuela Torres  
+- Matías Otero
+
+---
+
+## ⚙️ Tecnologías utilizadas
+
+- Django (Python Web Framework)
+- Python
+- HTML5 + Django Templates
+- SQLite3 (Base de datos)
+- ORM de Django
+- Bootstrap (para diseño frontend)
+
+---
+
+## 🔄 Flujo principal del sistema
+
+1. **Recepción de Equipos:** Se registran los equipos devueltos por los clientes.
+2. **Ingreso al Stock:** Los equipos son ingresados a inventario.
+3. **Revisión Técnica:** Se revisan uno por uno para evaluar su estado.
+4. **Clasificación Final:** Se les asigna un destino (por ejemplo, Nuevo, Averia, Destruccion, etc.).
+
+---
+
+
 ## Estructura del Proyecto
 
     comercio/
@@ -28,189 +60,48 @@ Este es el backend del sistema Enigma, un ERP modular desarrollado con Django y 
     │      ├── base.html
     │      └── dashboard.html
     │
-    ├── templates/ # Templates globales al proyecto
     │
     ├── manage.py # Script principal para administrar el proyecto
     │
     └── requirements.txt # Dependencias del proyecto
 
 
-### 🔧 0. PRUEBA CON AUTENTICACION
+###  🚀 Pasos para levantar el proyecto
 
-Primero debemos borrar todas las migraciones hechas
+###  1. Clonar el repositorio
 
-    rm usuarios/migrations/.py
-    rm ingresos/migrations/.py
-    rm ordenes/migrations/.py
-    rm stock/migrations/.py
-    rm despachos/migrations/.py
+    git clone https://github.com/teotronic5438/comercio.git
+    cd comercio
 
-Segundo: Primera migracion debe ser usuarios
-
-    python manage.py makemigrations usuarios    # devuelve la creacion de tabla usuarios y roles
-
-Tercero: Resto de  migraciones
-
-    python manage.py makemigrations     # devuelve la creacion de las otras tablas.
-
-Cuarto: Aplicamos migrate
-
-    python manage.py migrate
-
-Cinco: Si no esta, debe tener las bases de datos.
-
-Verificar que este copiada la base
-
-### 🔧 1. Entorno Virtual
-
-✅ Crear entorno virtual
+### 2. Crear un entorno virtual
 
     python -m venv env
+    source env/bin/activate  # Linux/macOS
+    env\Scripts\activate     # Windows
 
-✅ Activarlo
-
-En Windows:
-
-    .\env\Scripts\activate
-
-En Linux/macOS:
-
-    source venv/bin/activate
-
-✅ Desactivarlo
-
-    deactivate
-
-### 📦 2. Pip: congelar e instalar dependencias
-
-✅ Generar lista de paquetes
-
-    pip freeze > requirements.txt
-
-✅ Instalar desde requirements.txt
+### 3. Instalar dependencias
 
     pip install -r requirements.txt
 
-### 🚀 3. Comandos comunes de Django
+### 4. Migrar la base de datos
 
-✅ Ejecutar servidor
-
-    python manage.py runserver
-
-✅ Crear migraciones a partir de modelos
-
+    python manage.py makemigrations usuarios
     python manage.py makemigrations
-
-✅ Aplicar migraciones (crear las tablas en la BD)
-
     python manage.py migrate
 
-✅ Entrar al shell interactivo
-
-    python manage.py shell
-
-Ejemplo básico para probar modelos en el shell:
-
-    from apps.usuarios.models import Usuario  # o como se llame tu modelo
-    Usuario.objects.all()         # Ver todos los registros
-    Usuario.objects.create(nombre='Elías', email='ej@correo.com')  # Crear uno
-
-### 🛠️ 4. Crear proyecto Django
-
-✅ Crear un proyecto nuevo (estructura normal)
-
-    django-admin startproject config
-
-Esto crea:
-
-    config/
-    ├── manage.py
-    └── config/
-        ├── __init__.py
-        ├── settings.py
-        ├── urls.py
-        ├── asgi.py
-        └── wsgi.py
-
-### 📁 5. Crear proyecto DENTRO de una carpeta ya creada
-
-✅ Si ya tenés una carpeta vacía (ej: seting) y querés que el proyecto se llame config:
-
-    cd seting
-    django-admin startproject config .
-
-El . al final indica que los archivos deben crearse en el directorio actual, no anidar otro más.
-
-### 🧩 6. Crear apps Django
-
-✅ Crear app normalmente
-
-    python manage.py startapp core
-
-Esto genera la carpeta core/ en el mismo nivel que manage.py.
-
-### 📦 7. Crear apps DENTRO de una carpeta apps/
-
-Paso a paso:
-
-1) Crear la carpeta apps si no existe:
-
-    mkdir apps
-
-2) Crear la app dentro de apps:
-
-    django-admin startapp usuarios apps/usuarios
-
-Esto genera:
-
-    apps/
-    └── usuarios/
-        ├── admin.py
-        ├── apps.py
-        ├── models.py
-        ├── views.py
-        └── ...
-
-✅ Luego agregás 'apps.usuarios' o 'usuarios' (según tu estructura) a INSTALLED_APPS en settings.py.
-
-### 📦 8. Crear superusuario
-
-    python manage.py createsuperuser
-
-Seguir las indicaciones y guardar losd atos
-
-🧠 Resumen final:
-
-    | Acción                                     | Comando                                        |
-    | ------------------------------------------ | ---------------------------------------------- |
-    | Crear entorno virtual                      | `python -m venv venv`                          |
-    | Activar entorno                            | `venv\Scripts\activate` (Windows)              |
-    | Desactivar entorno                         | `deactivate`                                   |
-    | Guardar dependencias                       | `pip freeze > requirements.txt`                |
-    | Instalar desde archivo                     | `pip install -r requirements.txt`              |
-    | Crear proyecto nuevo                       | `django-admin startproject config`             |
-    | Crear proyecto dentro de carpeta existente | `django-admin startproject config .`           |
-    | Crear app                                  | `python manage.py startapp core`               |
-    | Crear app dentro de carpeta `apps/`        | `django-admin startapp usuarios apps/usuarios` |
-    | Correr servidor                            | `python manage.py runserver`                   |
-    | Crear migraciones                          | `python manage.py makemigrations`              |
-    | Aplicar migraciones                        | `python manage.py migrate`                     |
-    | Entrar al shell                            | `python manage.py shell`                       |
-
-
-
-### Flujo de trabajo
+### 5. Ejecutar el servidor
 
     python manage.py runserver
-    ↓
-    manage.py → settings.py
-    ↓
-    settings.py → ROOT_URLCONF = 'seting.urls'
-    ↓
-    seting/urls.py → path('', include('apps.core.urls'))
-    ↓
-    apps/core/urls.py → path('dashboard/', dashboard)
-    ↓
-    apps/core/views.py → def dashboard()
-    ↓
-    return render(template.html)
+
+Luego accedé al sistema desde tu navegador en:
+
+👉 http://127.0.0.1:8000
+
+### 📌 Notas adicionales
+
+    Recordá crear un superusuario con python manage.py createsuperuser para acceder al admin.
+
+    Para mejor experiencia de usuario, la base se envia con datos de prueba
+
+    En caso de errores con las migraciones, se recomienda eliminar db.sqlite3 y la carpeta __pycache__ y repetir los pasos de migración. 
+    Si se precisa borrar BBDD debe crearse primero el superusuario y generar las tablas lokup necesarias (Estados, Depositos, Destinos y Productos).
