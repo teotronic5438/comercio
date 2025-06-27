@@ -16,42 +16,43 @@
     <div class="container-fluid">
         <h2>Bienvenido al panel principal</h2>
 
-    <div class="chart-grid">
-        <div class="chart-item">
-            <h2>Total de Órdenes Activas</h2>
-            <canvas id="totalOrdenesActivasChart"></canvas>
+        <div class="chart-grid">
+            <div class="chart-item">
+                <h2>Total de Ordenes</h2>
+                <canvas id="totalOrdenesActivasChart"></canvas>
+            </div>
+
+            <div class="chart-item">
+                <h2>Ordenes Pendientes</h2>
+                <canvas id="pendientesRevisionActivasChart"></canvas>
+            </div>
+
+            <div class="chart-item">
+                <h2>Ordenes Revisadas</h2>
+                <canvas id="revisadasPalletizadasActivasChart"></canvas>
+            </div>
         </div>
 
-        <div class="chart-item">
-            <h2>Órdenes Pendientes de Revisión Activas</h2>
-            <canvas id="pendientesRevisionActivasChart"></canvas>
+        <hr>
+
+        <div class="chart-grid">
+            <div class="chart-item">
+                <h2>Destino Nuevo Activas</h2>
+                <canvas id="destinoNuevoActivasChart"></canvas>
+            </div>
+
+            <div class="chart-item">
+                <h2>Destino Avería Activas</h2>
+                <canvas id="destinoAveriaActivasChart"></canvas>
+            </div>
+
+            <div class="chart-item">
+                <h2>Destino Scrap Activas</h2>
+                <canvas id="destinoDestruccionActivasChart"></canvas>
+            </div>
         </div>
-
-        <div class="chart-item">
-            <h2>Órdenes Revisadas y Palletizadas Activas</h2>
-            <canvas id="revisadasPalletizadasActivasChart"></canvas>
-        </div>
-    </div>
-
-    <hr>
-
-    <div class="chart-grid">
-        <div class="chart-item">
-            <h2>Órdenes Destino Nuevo Activas</h2>
-            <canvas id="destinoNuevoActivasChart"></canvas>
-        </div>
-
-        <div class="chart-item">
-            <h2>Órdenes Destino Avería Activas</h2>
-            <canvas id="destinoAveriaActivasChart"></canvas>
-        </div>
-
-        <div class="chart-item">
-            <h2>Órdenes Destino Destrucción Activas</h2>
-            <canvas id="destinoDestruccionActivasChart"></canvas>
-        </div>
-    </div>
-
+        <!-- <p>{ { datos_grafico_destino_json } }</p>
+        <p>{ { datos_grafico_tipo_json } }</p> -->
     </div>
 
 {% endblock %}

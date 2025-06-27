@@ -31,8 +31,9 @@
 from django.shortcuts import render, HttpResponse
 from django.views import View
 from .models import StockProductos
+from django.contrib.auth.mixins import LoginRequiredMixin
 
-class StockView(View):
+class StockView(LoginRequiredMixin, View):
     def get(self, request):
         productos = StockProductos.objects.select_related('producto_id', 'deposito_id').all()
 

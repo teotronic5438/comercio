@@ -6,9 +6,12 @@ from apps.ordenes.models import Equipos, Ordenes, Estados
 from .forms import RemitoForm, RemitoProductoFormSet
 from django.views.generic import ListView
 from apps.stock.models import StockProductos, Depositos
+from django.contrib.auth.mixins import LoginRequiredMixin   # para proteger las vistas CBV
+from django.contrib.auth.decorators import login_required   # para proteger las vistas FBV
+
 
 # listado con clase
-class ListarRemitosView(ListView):
+class ListarRemitosView(LoginRequiredMixin, ListView):
     model = Remitos
     template_name = 'remitos/listar.html'
     context_object_name = 'remitos'
@@ -27,7 +30,7 @@ class ListarRemitosView(ListView):
 #     return render(request, 'remitos/listar.html', {'remitos': remitos, 'show_navbar': True})
 
 # listado aprobado con clase
-class ListarRemitosHistorialView(ListView):
+class ListarRemitosHistorialView(LoginRequiredMixin, ListView):
     model = Remitos
     template_name = 'remitos/listar_historial.html'
     context_object_name = 'remitos'
@@ -45,6 +48,8 @@ class ListarRemitosHistorialView(ListView):
 #     remitos = Remitos.objects.filter(aprobado=True)
 #     return render(request, 'remitos/listar_historial.html', {'remitos': remitos, 'show_navbar': True})
 
+
+@login_required     # SOLO EL DECORADOR, LA REDIRECCION ESTA DEFINIDA EN EL SETTING
 def crear_remito(request):
     if request.method == 'POST':
         form = RemitoForm(request.POST)
@@ -62,7 +67,7 @@ def crear_remito(request):
     return render(request, 'remitos/formulario.html', {'form': form, 'formset': formset})
 
 
-
+@login_required     # SOLO EL DECORADOR, LA REDIRECCION ESTA DEFINIDA EN EL SETTING
 def editar_remito(request, pk):
     remito = get_object_or_404(Remitos, pk=pk)
 
@@ -86,6 +91,8 @@ def editar_remito(request, pk):
 
     return render(request, 'remitos/formulario.html', {'form': form, 'formset': formset})
 
+
+@login_required     # SOLO EL DECORADOR, LA REDIRECCION ESTA DEFINIDA EN EL SETTING
 def ver_remito(request, pk):
     remito = get_object_or_404(Remitos, pk=pk)
     productos_relacionados = RemitoProducto.objects.filter(remito_id=remito)

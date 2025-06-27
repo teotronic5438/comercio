@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect
-
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 """ 
 def login(request):
     error = None
@@ -16,7 +17,7 @@ def login(request):
 
     return render(request, 'core/login.html', {'show_navbar': False, 'error': error})
 """ 
-
+@login_required
 def dashboard(request):
     if 'usuario' not in request.session:
         return redirect('Login')  # si no hay usuario en sesión, lo redirigimos al login
@@ -28,8 +29,8 @@ def dashboard(request):
  #   request.session.flush()  # eliminamos todos los datos de la sesión
   #  return redirect('Login')
 
-def home(request):
-    return render(request, 'core/home.html')
+# def home(request):
+#     return render(request, 'core/home.html')
 
 
 
@@ -41,7 +42,7 @@ import json # Necesario para json.dumps
 
 from apps.ordenes.models import Ordenes, Estados, Destinos # Asegúrate de importar todos los modelos necesarios
 
-class DashboardOrdenesView(TemplateView):
+class DashboardOrdenesView(LoginRequiredMixin, TemplateView):
     template_name = 'core/dashboard.html' # El nombre de tu plantilla HTML para el dashboard
 
     def get_context_data(self, **kwargs):

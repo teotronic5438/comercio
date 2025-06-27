@@ -16,13 +16,13 @@ from .views import ListarRemitosView, ListarRemitosHistorialView
 
 #apis
 from .views import remito_list, remito_create
-
+from django.contrib.auth.decorators import login_required
 
 urlpatterns = [
     # path('ingresos/', listar_remitos, name='ingresos'),
     # path('history/', listar_remitos_historial, name='ingresos_historial'),
-    path('ingresos/', ListarRemitosView.as_view(), name='ingresos'),
-    path('history/', ListarRemitosHistorialView.as_view(), name='ingresos_historial'),
+    path('ingresos/', login_required(ListarRemitosView.as_view()), name='ingresos'),
+    path('history/', login_required(ListarRemitosHistorialView.as_view()), name='ingresos_historial'),
     path('nuevo/', crear_remito, name='crear_remito'),
     path('editar/<int:pk>/', editar_remito, name='editar_remito'),
     path('eliminar/<int:pk>/', eliminar_remito, name='eliminar_remito'),

@@ -134,7 +134,7 @@ h1, h2 {
 .chart-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); /* 2 o 3 columnas, ajustables */
-    gap: 20px;
+    gap: 1em;
     width: 90%;
     max-width: 1200px;
     margin: 40px auto;
@@ -157,3 +157,7 @@ hr {
     width: 80%;
     margin: 40px auto;
 }
+
+
+
+/* estadistica B */

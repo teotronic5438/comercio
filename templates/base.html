@@ -37,55 +37,19 @@
 
     <!-- FOOTER FIJO AL FINAL -->
     <!-- { % include 'includes/footer.html' % } -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="{% static 'js/script.js' %}"></script>
     <!-- Bootstrap 5 JS (required for collapse) -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="{% static 'js/ordenes.js' %}"></script>
     <script src="{% static 'js/remitos.js' %}"></script>
     <script>
+        // logica para graficar canvas una vez este renderizado el documento
         document.addEventListener('DOMContentLoaded', () => {
-        let openMenus = [];
+            const datosGraficoTipo = JSON.parse('{{ datos_grafico_tipo_json|escapejs }}');
+            const datosGraficoDestino = JSON.parse('{{ datos_grafico_destino_json|escapejs }}');
 
-        try {
-            const storedMenus = localStorage.getItem('openSubmenus');
-            if (storedMenus) {
-            openMenus = JSON.parse(storedMenus);
-            }
-        } catch (e) {
-            console.warn('Error leyendo openSubmenus de localStorage:', e);
-            localStorage.removeItem('openSubmenus');  // Lo limpio para evitar futuros errores
-        }
-
-        // Restaurar submenús abiertos
-        openMenus.forEach(menuId => {
-            const submenu = document.getElementById(menuId);
-            if (submenu) {
-            submenu.classList.add('show');
-            const trigger = document.querySelector(`[href="#${menuId}"]`);
-            if (trigger) {
-                trigger.setAttribute('aria-expanded', 'true');
-            }
-            }
+            graficarCanvas(datosGraficoTipo, datosGraficoDestino);
         });
-
-        // Escuchar clics para guardar el estado
-        document.querySelectorAll('[data-bs-toggle="collapse"]').forEach(toggle => {
-            toggle.addEventListener('click', function () {
-            const menuId = this.getAttribute('href').replace('#', '');
-            const index = openMenus.indexOf(menuId);
-
-            if (index > -1) {
-                openMenus.splice(index, 1); // Cerrar
-            } else {
-                openMenus.push(menuId); // Abrir
-            }
-
-            localStorage.setItem('openSubmenus', JSON.stringify(openMenus));
-            });
-        });
-        });
-
     </script>
 </body>
 </html>
