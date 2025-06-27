@@ -70,17 +70,21 @@ function graficarCanvas(datosGraficoTipo, datosGraficoDestino) {
             id: 'centerLabel',
             beforeDraw(chart) {
                 const { width, height, ctx } = chart;
-                const total = chart.data.datasets[0].data[0];
+                const dataset = chart.data.datasets[0];
+                const value = dataset.data[0];
 
                 ctx.save();
-                ctx.font = 'bold 20px sans-serif';
+                ctx.font = 'bold 22px sans-serif';
                 ctx.fillStyle = '#333';
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
-                ctx.fillText(total, width / 2, height / 2);
+
+                // centrado perfecto en canvas
+                ctx.fillText(value, width / 2, height / 2);
                 ctx.restore();
             }
         };
+
 
 
         new Chart(ctx, {
