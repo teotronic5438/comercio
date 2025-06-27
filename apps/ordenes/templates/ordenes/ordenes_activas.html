@@ -6,6 +6,62 @@
 <h1 class="mt-3 mb-4">Órdenes activas</h1>
 <p><strong>Total de órdenes activas:</strong> {{ total_ordenes }}</p>
 
+<div class="busqueda-activa">
+    <form method="get" class="mb-4">
+        <div class="row">
+            <div class="mb-3">
+                <label for="buscar" class="form-label"><strong>Buscar por Nº de Serie o Modelo:</strong></label>
+                <input type="text" id="buscar" name="buscar" class="form-control" value="{{ request.GET.buscar }}">
+            </div>
+
+            <!-- Estados -->
+            <div class="col-md-4">
+            <label><strong>Filtrar por Estado:</strong></label><br>
+            {% for estado in estados %}
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="checkbox" name="estado" value="{{ estado.id }}"
+                    {% if estado.id|stringformat:"s" in filtro_estados %}checked{% endif %}>
+                <label class="form-check-label">{{ estado.nombre_estado }}</label>
+            </div>
+            {% endfor %}
+
+            </div>
+
+            <!-- Destinos -->
+            <div class="col-md-4">
+            <label><strong>Filtrar por Destino:</strong></label><br>
+            {% for destino in destinos %}
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="checkbox" name="destino" value="{{ destino.id }}"
+                    {% if destino.id|stringformat:"s" in filtro_destinos %}checked{% endif %}>
+                <label class="form-check-label">{{ destino.nombre_destino }}</label>
+            </div>
+            {% endfor %}
+
+            </div>
+
+            <!-- Palletizado -->
+            <div class="col-md-1">
+                <label><strong>¿Palletizado?</strong></label><br>
+                <div class="form-check form-check-inline">
+                <input class="form-check-input" type="checkbox" name="palletizado" value="1"
+                        {% if "1" in filtro_palletizado %}checked{% endif %}>
+                <label class="form-check-label">Sí</label>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="mt-3">
+            <button type="submit" class="btn btn-primary">Filtrar</button>
+            <a href="{% url 'ordenes_activas' %}" class="btn btn-secondary">Limpiar</a>
+        </div>
+    </form>
+
+
+</div>
+
+
 <div class="table-responsive">
     <table class="table table-bordered table-hover table-sm align-middle text-center w-100">
         <thead class="table-primary">

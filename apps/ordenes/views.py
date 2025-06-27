@@ -11,6 +11,7 @@ from django.urls import reverse_lazy
 from django.core.paginator import Paginator
 from .forms import EquipoForm
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.db import models
 
 
 ''' # vista anterior en funcion 
@@ -81,7 +82,7 @@ class OrdenesPendientesListView(LoginRequiredMixin, ListView):
     model = Ordenes
     template_name = 'ordenes/ordenes_pendientes.html'
     context_object_name = 'ordenes'
-    paginate_by = 15  # ✅ Paginación: 15 por página
+    paginate_by = 12  # ✅ Paginación: 15 por página
 
     def get_queryset(self):
         return Ordenes.objects.select_related(
@@ -176,12 +177,43 @@ class OrdenesActivasListView(LoginRequiredMixin, ListView):
     context_object_name = 'ordenes'
     paginate_by = 10  # 🔹 Paginación: 10 por página
 
+    # def get_queryset(self):
+    #     return Ordenes.objects.select_related(
+    #         'equipo_id__producto_id', 'estado_id'
+    #     ).filter(
+    #         orden_activa=True
+    #     ).order_by('-fecha_creacion')
+    
     def get_queryset(self):
-        return Ordenes.objects.select_related(
-            'equipo_id__producto_id', 'estado_id'
-        ).filter(
-            orden_activa=True
-        ).order_by('-fecha_creacion')
+        queryset = Ordenes.objects.select_related(
+            'equipo_id__producto_id', 'estado_id', 'destino'
+        ).filter(orden_activa=True)
+
+        # Filtros por GET
+        estados = self.request.GET.getlist('estado')
+        destinos = self.request.GET.getlist('destino')
+        palletizado = self.request.GET.getlist('palletizado')
+        buscar = self.request.GET.get('buscar', '').strip()
+
+        if estados:
+            queryset = queryset.filter(estado_id__in=estados)
+
+        if destinos:
+            queryset = queryset.filter(destino__in=destinos)
+
+        if palletizado:
+            queryset = queryset.filter(equipo_palletizado=True)
+            
+        
+        if buscar:
+            queryset = queryset.filter(
+                models.Q(equipo_id__numero_serie__icontains=buscar) |
+                models.Q(equipo_id__producto_id__modelo__icontains=buscar)
+            )
+
+        return queryset.order_by('-fecha_creacion')
+    
+    
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -197,5 +229,13 @@ class OrdenesActivasListView(LoginRequiredMixin, ListView):
             })
 
         context['ordenes'] = datos_ordenes
-        context['total_ordenes'] = self.get_queryset().count()  # 🔹 Total informativo
+        context['total_ordenes'] = self.get_queryset().count()
+        context['estados'] = Estados.objects.all()
+        context['destinos'] = Destinos.objects.all()
+
+        # 👇 Pasamos los filtros seleccionados
+        context['filtro_estados'] = self.request.GET.getlist('estado')
+        context['filtro_destinos'] = self.request.GET.getlist('destino')
+        context['filtro_palletizado'] = self.request.GET.getlist('palletizado')
+
         return context
