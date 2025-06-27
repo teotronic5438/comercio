@@ -158,7 +158,7 @@ function graficarCanvas(datosGraficoTipo, datosGraficoDestino) {
     // Gráfico 3: Órdenes Revisadas/Palletizadas Activas
     createDoughnutChart(
         'revisadasPalletizadasActivasChart',
-        'Revisadas/Palletizadas',
+        'Revisados',
         datosGraficoTipo.revisadas_activas,
         'rgba(54, 162, 235, 0.7)',
         'rgba(54, 162, 235, 1)',
@@ -171,7 +171,7 @@ function graficarCanvas(datosGraficoTipo, datosGraficoDestino) {
 
     createDoughnutChart(
         'destinoNuevoActivasChart',
-        'Equipos Nuevos', // Etiqueta más descriptiva
+        'Nuevos', // Etiqueta más descriptiva
         datosGraficoDestino.destino_nuevo_activas,
         'rgba(255, 206, 86, 0.7)',
         'rgba(255, 206, 86, 1)',
@@ -180,7 +180,7 @@ function graficarCanvas(datosGraficoTipo, datosGraficoDestino) {
 
     createDoughnutChart(
         'destinoAveriaActivasChart',
-        'Equipos Avería',
+        'Avería',
         datosGraficoDestino.destino_averia_activas,
         'rgba(153, 102, 255, 0.7)',
         'rgba(153, 102, 255, 1)',
@@ -189,7 +189,7 @@ function graficarCanvas(datosGraficoTipo, datosGraficoDestino) {
 
     createDoughnutChart(
         'destinoDestruccionActivasChart',
-        'Equipos Destrucción',
+        'Destrucción',
         datosGraficoDestino.destino_destruccion_activas,
         'rgba(255, 159, 64, 0.7)',
         'rgba(255, 159, 64, 1)',
