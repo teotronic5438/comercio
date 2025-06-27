@@ -183,6 +183,7 @@ h1, h2 {
     justify-content: space-between;
     margin: 0 auto;
     text-align: center;
+    overflow-y: auto;
 }
 
 .chart-item h2 {

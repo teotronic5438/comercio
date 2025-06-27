@@ -9,7 +9,7 @@ from django.views.generic.edit import UpdateView
 from django.utils.timezone import now
 from django.urls import reverse_lazy
 from django.core.paginator import Paginator
-from .forms import EquipoForm
+from .forms import EquipoForm, OrdenForm
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db import models
 
@@ -143,7 +143,9 @@ class OrdenesPendientesListView(LoginRequiredMixin, ListView):
 #         orden.fecha_revision = now()
         
 #         return super().form_valid(form)
-    
+
+
+'''
 class RevisarOrdenUpdateView(LoginRequiredMixin, UpdateView):
     model = Ordenes
     fields = ['falla_detectada', 'reparacion', 'destino']
@@ -179,6 +181,43 @@ class RevisarOrdenUpdateView(LoginRequiredMixin, UpdateView):
             return self.render_to_response(
                 self.get_context_data(form=form, equipo_form=equipo_form)
             )
+'''
+
+class RevisarOrdenUpdateView(LoginRequiredMixin, UpdateView):
+    model = Ordenes
+    form_class = OrdenForm  # <-- Usamos nuestro form personalizado
+    template_name = 'ordenes/revisar_orden.html'
+    success_url = reverse_lazy('ordenes_pendientes')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        orden = self.object
+        equipo_form = kwargs.get('equipo_form') or EquipoForm(instance=orden.equipo_id)
+        context.update({
+            'estados': Estados.objects.all(),
+            'destinos': Destinos.objects.all(),
+            'equipo_form': equipo_form
+        })
+        return context
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        form = self.get_form()
+        equipo_form = EquipoForm(request.POST, instance=self.object.equipo_id)
+
+        if form.is_valid() and equipo_form.is_valid():
+            orden = form.save(commit=False)
+            orden._request = self.request
+            orden.estado_id, _ = Estados.objects.get_or_create(nombre_estado='Revisado')
+            orden.fecha_revision = now()
+            orden.save()
+            equipo_form.save()
+            return self.form_valid(form)
+        else:
+            return self.render_to_response(
+                self.get_context_data(form=form, equipo_form=equipo_form)
+            )
+
 
 
 # creando solo ordenes activas de prueba
