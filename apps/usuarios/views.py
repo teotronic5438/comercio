@@ -5,17 +5,20 @@ from django.urls import reverse_lazy
 #from django.utils.decorators import method_decorator
 #from django.views.decorators.cache import never_cache
 #from django.views.decorators.csrf import csrf_protect
+from django.contrib.auth.mixins import LoginRequiredMixin
 from .forms import FormularioLogin, FormularioUsuario
 from django.contrib.auth import login as auth_login, authenticate, logout
 from django.views.generic.edit import FormView, CreateView
-from django.contrib.auth.views import LoginView
+from django.contrib.auth.views import LoginView, LogoutView
 from .models import Usuarios, Roles
 
 
-
-def logoutUsuario(request):
-     logout(request)
-     return HttpResponseRedirect('/usuarios/login/')  #ex: return HttpResponseRedirect('usuarios:login')
+class LogoutUsuarioView(LoginRequiredMixin, LogoutView):
+    next_page = '/usuarios/login/'
+    
+# def logoutUsuario(request):
+#      logout(request)
+#      return HttpResponseRedirect('/usuarios/login/')  #ex: return HttpResponseRedirect('usuarios:login')
 
 
 def login_view(request):

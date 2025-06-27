@@ -150,7 +150,8 @@ REST_FRAMEWORK = {
 
 
 # Para proteccion de rutas si no esta logeado lo saca del sitio
-LOGIN_REDIRECT_URL = 'core:home'
+# LOGIN_REDIRECT_URL = 'core:home'
+LOGIN_REDIRECT_URL = 'core:dashboard'
 LOGOUT_REDIRECT_URL = 'usuarios:login'
 LOGIN_URL = 'usuarios:login'
 
