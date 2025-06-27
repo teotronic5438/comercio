@@ -1,72 +1,107 @@
-<div id="sidebar" class="bg-secondary text-white p-3" style="width: 200px">
-  <h5>Menú</h5>
+<div id="sidebar" class="bg-secondary text-white p-3" style="width: 250px;">
+  <h5><span class="me-2">&#127968;</span> Menú</h5>  <!-- 🏠 -->
   <ul class="nav flex-column">
+
+    <!-- INGRESOS -->
     <li class="nav-item">
-      <a
-        class="nav-link text-white d-flex justify-content-between align-items-center"
-        data-bs-toggle="collapse"
-        href="#submenuIngresos"
-        role="button"
-        aria-expanded="false"
-        aria-controls="submenuIngresos"
-      >
-        Ingresos
+      <a class="nav-link text-white d-flex justify-content-between align-items-center"
+         data-bs-toggle="collapse"
+         href="#submenuIngresos"
+         role="button"
+         aria-expanded="false"
+         aria-controls="submenuIngresos">
+        <span class="me-2">&#128179;</span> Ingresos
         <span class="ms-auto">&#9662;</span>
-        </a>
-      <ul class="collapse list-unstyled ps-3" id="submenuIngresos">
+      </a>
+      <ul class="collapse list-unstyled ps-3" id="submenuIngresos" data-menu="submenuIngresos">
         <li>
-          <a class="nav-link text-white" href="{% url 'ingresos' %}"
-            >Ingresos</a
-          >
+          <a class="nav-link text-white {% if request.resolver_match.url_name == 'ingresos' %}active{% endif %}" href="{% url 'ingresos' %}">
+            <span class="me-2">&#10133;</span> Ingresos
+          </a>
         </li>
         <li>
-          <a class="nav-link text-white" href="{% url 'ingresos_historial' %}"
-            >Historial de Ingresos</a
-          >
+          <a class="nav-link text-white {% if request.resolver_match.url_name == 'ingresos_historial' %}active{% endif %}" href="{% url 'ingresos_historial' %}">
+            <span class="me-2">&#128221;</span> Historial
+          </a>
         </li>
       </ul>
     </li>
 
+    <!-- STOCK -->
     <li class="nav-item">
-      <a class="nav-link text-white" href="{% url 'stock' %}">Stock</a>
+      <a class="nav-link text-white {% if request.resolver_match.url_name == 'stock' %}active{% endif %}" href="{% url 'stock' %}">
+        <span class="me-2">&#128230;</span> Stock
+      </a>
     </li>
 
+    <!-- ÓRDENES -->
     <li class="nav-item">
-      <a class="nav-link text-white" href="{% url 'ordenes_pendientes' %}"
-        >Ordenes</a
-      >
-    </li>
-       <li class="nav-item">
-      <a class="nav-link text-white" href="{% url 'ordenes_activas' %}"
-        >Ordenes Activas</a
-      >
-    </li>
-
-   <li class="nav-item">
-      <a class="nav-link text-white" href="{% url 'despachos:ordenes_revisadas' %}">Revisados</a>
-    </li>
-
-    <li class="nav-item">
-      <a
-        class="nav-link text-white d-flex justify-content-between align-items-center"
-        data-bs-toggle="collapse"
-        href="#submenuDespachos"
-        role="button"
-        aria-expanded="false"
-        aria-controls="submenuDespachos"
-      >
-        Despachos
+      <a class="nav-link text-white d-flex justify-content-between align-items-center"
+         data-bs-toggle="collapse"
+         href="#submenuOrdenes"
+         role="button"
+         aria-expanded="false"
+         aria-controls="submenuOrdenes">
+        <span class="me-2">&#128221;</span> Órdenes
         <span class="ms-auto">&#9662;</span>
-        </a>
-      <ul class="collapse list-unstyled ps-3" id="submenuDespachos">
-        <li><a class="nav-link text-white" href="{% url 'despachos:ordenes_nuevas' %}">Nuevos</a></li>
-        <li><a class="nav-link text-white" href="{% url 'despachos:ordenes_averiadas' %}">Averías</a></li>
-        <li><a class="nav-link text-white" href="{% url 'despachos:ordenes_destruccion' %}">Destrucción</a></li>
+      </a>
+      <ul class="collapse list-unstyled ps-3" id="submenuOrdenes" data-menu="submenuOrdenes">
+        <li>
+          <a class="nav-link text-white {% if request.resolver_match.url_name == 'ordenes_pendientes' %}active{% endif %}" href="{% url 'ordenes_pendientes' %}">
+            <span class="me-2">&#9203;</span> Pendientes
+          </a>
+        </li>
+        <li>
+          <a class="nav-link text-white {% if request.resolver_match.url_name == 'ordenes_activas' %}active{% endif %}" href="{% url 'ordenes_activas' %}">
+            <span class="me-2">&#128337;</span> Avanzadas
+          </a>
+        </li>
       </ul>
     </li>
 
+    <!-- REVISADOS -->
     <li class="nav-item">
-      <a class="nav-link text-white" href="#">Reportes</a>
+      <a class="nav-link text-white {% if request.resolver_match.url_name == 'ordenes_revisadas' %}active{% endif %}" href="{% url 'despachos:ordenes_revisadas' %}">
+        <span class="me-2">&#9989;</span> Revisados
+      </a>
     </li>
+
+    <!-- DESPACHOS -->
+    <li class="nav-item">
+      <a class="nav-link text-white d-flex justify-content-between align-items-center"
+         data-bs-toggle="collapse"
+         href="#submenuDespachos"
+         role="button"
+         aria-expanded="false"
+         aria-controls="submenuDespachos">
+        <span class="me-2">&#128666;</span> Despachos
+        <span class="ms-auto">&#9662;</span>
+      </a>
+      <ul class="collapse list-unstyled ps-3" id="submenuDespachos" data-menu="submenuDespachos">
+        <li>
+          <a class="nav-link text-white {% if request.resolver_match.url_name == 'ordenes_nuevas' %}active{% endif %}" href="{% url 'despachos:ordenes_nuevas' %}">
+            <span class="me-2">&#10133;</span> Nuevos
+          </a>
+        </li>
+        <li>
+          <a class="nav-link text-white {% if request.resolver_match.url_name == 'ordenes_averiadas' %}active{% endif %}" href="{% url 'despachos:ordenes_averiadas' %}">
+            <span class="me-2">&#9888;</span> Averías
+          </a>
+        </li>
+        <li>
+          <a class="nav-link text-white {% if request.resolver_match.url_name == 'ordenes_destruccion' %}active{% endif %}" href="{% url 'despachos:ordenes_destruccion' %}">
+            <span class="me-2">&#128465;</span> Destrucción
+          </a>
+        </li>
+      </ul>
+    </li>
+
+    <!-- REPORTES -->
+    <li class="nav-item">
+      <a class="nav-link text-white" href="#">
+        <span class="me-2">&#128202;</span> Reportes
+      </a>
+    </li>
+
   </ul>
 </div>

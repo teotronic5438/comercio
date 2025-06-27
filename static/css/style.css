@@ -109,6 +109,15 @@
   height: 34px;
 }
 
+/* para el menu */
+.active {
+  background-color: #343a40 !important; /* gris más oscuro */
+  font-weight: bold;
+  border-radius: 0.25rem;
+}
+
+
+
 /***************************
     para las estadisticas
 ***************************/

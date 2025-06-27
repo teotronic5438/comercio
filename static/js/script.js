@@ -2,6 +2,8 @@ function toggleSidebar() {
     document.getElementById('sidebar').classList.toggle('collapsed');
 }
 
+
+
 // Logica para los graficos estadisticos
 // Paso 1: Obtener los datos JSON que Django nos envió
 const datosGraficoTipo = JSON.parse('{{ datos_grafico_tipo_json|escapejs }}');
