@@ -1,17 +1,17 @@
 {% load static %}
-<nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm">
+<nav class="navbar navbar-expand-lg shadow-sm navbar-gradient">
   <div class="container-fluid">
     <a class="navbar-brand d-flex align-items-center" href="{% url 'core:dashboard' %}">
       <!-- <img src="{ % static 'img/enigma_img.jpg' % }" alt="LOGO DE RUBIC ENIGMA" width="30" height="30" class="me-2">
       <span class="fw-bold">ENIGMA</span> -->
-      <div class="card-header"><img class="logo_form" src="{% static 'img/logo_form.png' %}" alt=""></div>
+      <div class="card-header"><img class="logo_form" src="{% static 'img/enigmaLogoNuevo.png' %}"  alt=""></div>
     </a>
 
 
     <div class="d-flex ms-auto">
       {% if user.is_authenticated %}
         <div class="dropdown">
-          <a class="btn btn-outline-secondary dropdown-toggle" href="#" role="button" id="dropdownUser" data-bs-toggle="dropdown" aria-expanded="false">
+          <a class="btn btn-primary" href="#" role="button" id="dropdownUser" data-bs-toggle="dropdown" aria-expanded="false">
             {{ user.username }} (rol {{ user.rol }})
           </a>
           <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownUser">

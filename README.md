@@ -4,10 +4,8 @@ Este es el backend del sistema Enigma, un ERP modular desarrollado con Django y 
 
 ## 👨‍💻 Integrantes del equipo
 
-- Gonzalo Costas  
 - Néstor Díaz  
-- Ariel Iha  
-- José Moya  
+- Melvin Farias
 - Elías Orihuela Torres  
 - Matías Otero
 

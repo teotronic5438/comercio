@@ -26,6 +26,12 @@ class UsuarioLoginView(LoginView):
     redirect_authenticated_user = True
     next_page = reverse_lazy('core:dashboard')
 
+    def get_context_data(self, **kwargs):
+        """Añade la variable 'is_login_page' al contexto de la plantilla."""
+        context = super().get_context_data(**kwargs)
+        context['is_login_page'] = True
+        return context
+
     def get_success_url(self):
         return self.get_redirect_url() or self.next_page
 

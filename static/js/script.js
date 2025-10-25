@@ -95,8 +95,8 @@ function graficarCanvas(datosGraficoTipo, datosGraficoDestino) {
                 datasets: [{
                     label: 'Cantidad',
                     data: [dataValue, remainingValue], // Aquí se calcula el resto
-                    backgroundColor: [backgroundColor, 'rgba(200, 200, 200, 0.4)'], // Color para el valor y un gris para el resto
-                    borderColor: [borderColor, 'rgba(200, 200, 200, 1)'],
+                    backgroundColor: [backgroundColor, 'rgba(200, 200, 200, 0.98)'], // Color para el valor y un gris para el resto
+                    borderColor: [borderColor, 'rgba(158, 158, 158, 1)'],
                     borderWidth: 1
                 }]
             },
@@ -140,8 +140,8 @@ function graficarCanvas(datosGraficoTipo, datosGraficoDestino) {
         'totalOrdenesActivasChart',
         'Total Activas', // Etiqueta principal
         totalOrdenesActivas, // Valor del segmento principal
-        'rgba(75, 192, 192, 0.7)',
-        'rgba(75, 192, 192, 1)',
+        'rgba(247, 57, 57, 0.8)',
+        'rgba(177, 30, 30, 1)',
         totalOrdenesActivas // El total de comparación es el mismo valor para este gráfico
     );
 
@@ -150,8 +150,8 @@ function graficarCanvas(datosGraficoTipo, datosGraficoDestino) {
         'pendientesRevisionActivasChart',
         'Pendientes',
         datosGraficoTipo.pendientes_revision_activas,
-        'rgba(255, 99, 132, 0.7)',
-        'rgba(255, 99, 132, 1)',
+        'rgba(20, 88, 198, 0.84)',
+        'rgba(6, 56, 255, 0.91)',
         totalOrdenesActivas // El total de comparación es el total de órdenes activas
     );
 
@@ -160,8 +160,8 @@ function graficarCanvas(datosGraficoTipo, datosGraficoDestino) {
         'revisadasPalletizadasActivasChart',
         'Revisados',
         datosGraficoTipo.revisadas_activas,
-        'rgba(54, 162, 235, 0.7)',
-        'rgba(54, 162, 235, 1)',
+        'rgba(12, 161, 25, 0.9)',
+        'rgba(16, 76, 20, 1)',
         totalOrdenesActivas // El total de comparación es el total de órdenes activas
     );
 
@@ -173,8 +173,8 @@ function graficarCanvas(datosGraficoTipo, datosGraficoDestino) {
         'destinoNuevoActivasChart',
         'Nuevos', // Etiqueta más descriptiva
         datosGraficoDestino.destino_nuevo_activas,
-        'rgba(255, 206, 86, 0.7)',
-        'rgba(255, 206, 86, 1)',
+        'rgba(255, 208, 0, 0.95)',
+        'rgba(255, 183, 0, 1)',
         totalOrdenesActivas // ¡Aquí está el cambio clave! Se compara con el total de órdenes activas.
     );
 
@@ -182,8 +182,8 @@ function graficarCanvas(datosGraficoTipo, datosGraficoDestino) {
         'destinoAveriaActivasChart',
         'Avería',
         datosGraficoDestino.destino_averia_activas,
-        'rgba(153, 102, 255, 0.7)',
-        'rgba(153, 102, 255, 1)',
+        'rgba(247, 57, 57, 0.8)',
+        'rgba(177, 30, 30, 1)',
         totalOrdenesActivas // ¡Aquí está el cambio clave!
     );
 
@@ -191,8 +191,8 @@ function graficarCanvas(datosGraficoTipo, datosGraficoDestino) {
         'destinoDestruccionActivasChart',
         'Destrucción',
         datosGraficoDestino.destino_destruccion_activas,
-        'rgba(255, 159, 64, 0.7)',
-        'rgba(255, 159, 64, 1)',
+        'rgba(20, 88, 198, 0.84)',
+        'rgba(6, 56, 255, 0.91)',
         totalOrdenesActivas // ¡Aquí está el cambio clave!
     );
 

@@ -9,22 +9,24 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
     <link rel="stylesheet" href="{% static 'css/ordenes.css' %}">
-    <link rel="icon" href="{% static 'img/enigma.ico' %}" type="image/x-icon">
+    <link rel="icon" href="{% static 'img/favicon-32x32.png' %}" type="image/x-icon">
 </head>
 <body class="d-flex flex-column min-vh-100">
 
-    <!-- HEADER FIJO -->
-    {% include 'includes/header.html' %}
+    {% if not is_login_page %}
+        {% include 'includes/header.html' %}
+    {% endif %}
+
 
     <!-- CONTENIDO CENTRAL -->
     <div class="d-flex flex-grow-1">
         <!-- SIDEBAR si corresponde -->
-        {% if user.is_authenticated %}
+        {% if user.is_authenticated and not is_login_page %}
             {% include 'includes/navbar.html' %}
         {% endif %}
         <!-- MAIN con scroll si hay mucho contenido -->
         <main class="flex-grow-1 p-3 overflow-auto">
-            {% if user.is_authenticated %}
+            {% if user.is_authenticated and not is_login_page %}
                 <button class="btn btn-outline-primary mb-1" onclick="toggleSidebar()">☰</button>
             {% endif %}
 

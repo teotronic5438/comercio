@@ -83,7 +83,7 @@ class OrdenesPendientesListView(LoginRequiredMixin, ListView):
     model = Ordenes
     template_name = 'ordenes/ordenes_pendientes.html'
     context_object_name = 'ordenes'
-    paginate_by = 12    # ✅ Paginación: 12 por página
+    paginate_by = 10    # ✅ Paginación: 12 por página
 
     def get_queryset(self):
         queryset = Ordenes.objects.select_related(
