@@ -1,153 +1,147 @@
 {% extends 'base.html' %}
 
-{% block title %}Órdenes activas{% endblock %}
+{% block title %}Órdenes Activas{% endblock %}
 
 {% block content %}
-<h2 class="mt-3 mb-4">Ordenes Avanzado</h2>
-<p><strong>Resultado de ordenes:</strong> {% if total_ordenes %} {{ total_ordenes }} {% endif %}</p>
+<div class="page-container px-4 mt-3">
+    <!-- 🔹 Encabezado con ícono -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold text-primary">
+            <i class="bi bi-clipboard-check text-primary me-2"></i>
+            Órdenes Avanzado
+        </h2>
+        {% if total_ordenes %}
+        <span class="badge bg-info text-dark fs-6 px-3 py-2 shadow-sm">
+            Total: {{ total_ordenes }}
+        </span>
+        {% endif %}
+    </div>
 
-<div class="busqueda-activa">
-    <form method="get" class="mb-4">
-        <div class="row">
-            <div class="mb-3">
-            <label for="buscar" class="form-label"><strong>Buscar por Nº de Serie o Modelo:</strong></label>
-            <div class="input-group w-50">
-                <input type="text" id="buscar" name="buscar" class="form-control" placeholder="Buscar..." value="{{ request.GET.buscar }}">
-                <button class="btn btn-primary mx-3" type="submit">
-                <i class="bi bi-search"></i> Buscar
-                </button>
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb bg-light rounded p-2">
+            <li class="breadcrumb-item">
+                <i class="bi bi-house-door"></i> Inicio
+            </li>
+            <li class="breadcrumb-item">
+                Órdenes
+            </li>
+            <li class="breadcrumb-item text-primary" aria-current="page">Avanzado</li>
+        </ol>
+    </nav>
+
+    <!-- 🔍 Formulario de búsqueda y filtros -->
+    <form method="get" class="mb-4 p-3 border rounded-3 shadow-sm bg-light">
+        <div class="row g-3 align-items-center">
+
+            <!-- Buscar -->
+            <div class="col-md-5">
+                <label for="buscar" class="form-label fw-bold mb-1">Buscar por Nº de Serie o Modelo:</label>
+                <div class="input-group">
+                    <input type="text" id="buscar" name="buscar" class="form-control"
+                           placeholder="Buscar..." value="{{ request.GET.buscar }}">
+                    <button class="btn btn-primary" type="submit">
+                        <i class="bi bi-search"></i> Buscar
+                    </button>
+                </div>
             </div>
+
+            <!-- Estado -->
+            <div class="col-md-3">
+                <label class="form-label fw-bold mb-1">Filtrar por Estado:</label><br>
+                {% for estado in estados %}
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="checkbox" name="estado" value="{{ estado.id }}"
+                        {% if estado.id|stringformat:"s" in filtro_estados %}checked{% endif %}>
+                    <label class="form-check-label small">{{ estado.nombre_estado }}</label>
+                </div>
+                {% endfor %}
             </div>
 
-
-            <!-- Estados -->
-            <div class="col-md-4">
-            <label><strong>Filtrar por Estado:</strong></label><br>
-            {% for estado in estados %}
-            <div class="form-check form-check-inline">
-                <input class="form-check-input" type="checkbox" name="estado" value="{{ estado.id }}"
-                    {% if estado.id|stringformat:"s" in filtro_estados %}checked{% endif %}>
-                <label class="form-check-label">{{ estado.nombre_estado }}</label>
-            </div>
-            {% endfor %}
-
-            </div>
-
-            <!-- Destinos -->
-            <div class="col-md-4">
-            <label><strong>Filtrar por Destino:</strong></label><br>
-            {% for destino in destinos %}
-            <div class="form-check form-check-inline">
-                <input class="form-check-input" type="checkbox" name="destino" value="{{ destino.id }}"
-                    {% if destino.id|stringformat:"s" in filtro_destinos %}checked{% endif %}>
-                <label class="form-check-label">{{ destino.nombre_destino }}</label>
-            </div>
-            {% endfor %}
-
+            <!-- Destino -->
+            <div class="col-md-3">
+                <label class="form-label fw-bold mb-1">Filtrar por Destino:</label><br>
+                {% for destino in destinos %}
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="checkbox" name="destino" value="{{ destino.id }}"
+                        {% if destino.id|stringformat:"s" in filtro_destinos %}checked{% endif %}>
+                    <label class="form-check-label small">{{ destino.nombre_destino }}</label>
+                </div>
+                {% endfor %}
             </div>
 
             <!-- Palletizado -->
-            <div class="col-md-1">
-                <label><strong>¿Palletizado?</strong></label><br>
+            <div class="col-md-1 text-center">
+                <label class="form-label fw-bold mb-1">¿Palletizado?</label><br>
                 <div class="form-check form-check-inline">
-                <input class="form-check-input" type="checkbox" name="palletizado" value="1"
+                    <input class="form-check-input" type="checkbox" name="palletizado" value="1"
                         {% if "1" in filtro_palletizado %}checked{% endif %}>
-                <label class="form-check-label">Sí</label>
+                    <label class="form-check-label small">Sí</label>
                 </div>
-
             </div>
         </div>
 
         <div class="mt-3">
-            <button type="submit" class="btn btn-primary">Filtrar</button>
-            <a href="{% url 'ordenes_activas' %}" class="btn btn-secondary">Limpiar</a>
+            <button type="submit" class="btn btn-primary px-4 me-2">
+                <i class="bi bi-funnel"></i> Filtrar
+            </button>
+            <a href="{% url 'ordenes_activas' %}" class="btn btn-secondary">
+                <i class="bi bi-x-circle"></i> Limpiar
+            </a>
         </div>
     </form>
 
-
-</div>
-
-
-<div class="table-responsive">
-    <table class="table table-bordered table-hover table-sm align-middle text-center w-100">
-        <thead class="table-primary">
-            <tr>
-                <th style="width: 10%;">Acción</th>
-                <th style="width: 15%;">Orden</th>
-                <th style="width: 20%;">Modelo</th>
-                <th style="width: 20%;">Fecha de Creación</th>
-                <th style="width: 20%;">Tiempo Transcurrido</th>
-                <th style="width: 15%;">Estado</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for orden in ordenes %}
-            <tr>
-                <td>
-                    <a href="{% url 'revisar_orden' orden.id %}" class="btn btn-outline-primary btn-sm">Ver detalle</a>
-                </td>
-                <td>enigma-A{{ orden.id }}</td>
-                <td>{{ orden.modelo }}</td>
-                <td>{{ orden.fecha_creacion|date:"d/m/Y H:i" }}</td>
-                <td>
-                    {% with orden.tiempo_transcurrido as t %}
-                        {{ t.days }} días,
-                        {% widthratio t.seconds 3600 1 %} horas
-                    {% endwith %}
-                </td>
-                <!-- <td>
-                    <span class="badge bg-warning">{{ orden.estado }}</span>
-                </td> -->
-                <td>
-                    {% if orden.estado == "Pendiente" %}
-                        <span class="badge bg-warning">{{ orden.estado }}</span>
-                    {% elif orden.estado == "Revisado" %}
-                        <span class="badge bg-success">{{ orden.estado }}</span>
-                    {% elif orden.estado == "Palletizado" %}
-                        <span class="badge bg-primary">{{ orden.estado }}</span>
-                    {% elif orden.estado == "Despachado" %}
-                        <span class="badge bg-secondary">{{ orden.estado }}</span>
-                    {% else %}
-                        <span class="badge bg-light text-dark">{{ orden.estado }}</span>
-                    {% endif %}
-                </td>
-
-            </tr>
-            {% empty %}
-            <tr>
-                <td colspan="6" class="text-muted">No hay órdenes activas.</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-
-    <nav aria-label="Paginación">
-    <ul class="pagination justify-content-center">
-        {% if page_obj.has_previous %}
-        <li class="page-item">
-            <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Anterior</a>
-        </li>
-        {% else %}
-        <li class="page-item disabled"><span class="page-link">Anterior</span></li>
-        {% endif %}
-
-        {% for num in page_obj.paginator.page_range %}
-        {% if page_obj.number == num %}
-            <li class="page-item active"><span class="page-link">{{ num }}</span></li>
-        {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
-            <li class="page-item"><a class="page-link" href="?page={{ num }}">{{ num }}</a></li>
-        {% endif %}
-        {% endfor %}
-
-        {% if page_obj.has_next %}
-        <li class="page-item">
-            <a class="page-link" href="?page={{ page_obj.next_page_number }}">Siguiente</a>
-        </li>
-        {% else %}
-        <li class="page-item disabled"><span class="page-link">Siguiente</span></li>
-        {% endif %}
-    </ul>
-    </nav>
-
+    <!-- 🧾 Tabla -->
+    <div class="table-responsive shadow-sm rounded-3">
+        <table class="table table-hover align-middle text-center m-0">
+            <thead class="table-header">
+                <tr>
+                    <th>Acción</th>
+                    <th>Orden</th>
+                    <th>Modelo</th>
+                    <th>Fecha de Creación</th>
+                    <th>Tiempo Transcurrido</th>
+                    <th>Estado</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for orden in ordenes %}
+                <tr>
+                    <td>
+                        <a href="{% url 'revisar_orden' orden.id %}"
+                           class="btn btn-outline-primary btn-sm shadow-sm">
+                            Ver detalle
+                        </a>
+                    </td>
+                    <td><strong>ENIGMA-A{{ orden.id }}</strong></td>
+                    <td>{{ orden.modelo }}</td>
+                    <td>{{ orden.fecha_creacion|date:"d/m/Y H:i" }}</td>
+                    <td>
+                        {% with orden.tiempo_transcurrido as t %}
+                            {{ t.days }} días, {% widthratio t.seconds 3600 1 %} horas
+                        {% endwith %}
+                    </td>
+                    <td>
+                        {% if orden.estado == "Pendiente" %}
+                            <span class="badge bg-warning text-dark px-3 py-2">Pendiente</span>
+                        {% elif orden.estado == "Revisado" %}
+                            <span class="badge bg-success px-3 py-2">Revisado</span>
+                        {% elif orden.estado == "Palletizado" %}
+                            <span class="badge bg-primary px-3 py-2">Palletizado</span>
+                        {% elif orden.estado == "Despachado" %}
+                            <span class="badge bg-secondary px-3 py-2">Despachado</span>
+                        {% else %}
+                            <span class="badge bg-light text-dark px-3 py-2">{{ orden.estado }}</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" class="text-muted py-4">No hay órdenes activas.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </div>
 {% endblock %}

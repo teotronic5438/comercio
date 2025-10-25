@@ -55,7 +55,8 @@
     MENU DASHBOARD
 *********************/
 #sidebar {
-  min-height: 100vh;
+  /* para que el alto no se desborde por el min 100vh */
+  /* min-height: 100vh; */
   transition: all 0.3s;
 }
 
@@ -167,6 +168,10 @@ h1,
 h2 {
   text-align: center;
   color: #0056b3;
+}
+
+h2.ordenes_despachos{
+  text-align: left;
 }
 
 /* 
