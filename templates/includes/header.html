@@ -8,10 +8,13 @@
       </div>
     </a>
 
-    <!-- DIV CENTRAL PARA INFO DE API -->
-    <div class="mx-auto text-center d-none d-lg-block" id="info-api">
-      <!-- Aquí se cargará la info de la API -->
-      <span class="text-white fw-bold">Cargando información...</span>
+    <!-- DIV CENTRAL PARA CINTA DE TIPOS DE CAMBIO -->
+    <div class="mx-auto text-center d-none d-lg-block">
+        <div class="ticker-container text-white py-1 px-2 rounded">
+            <div class="ticker" id="ticker-api">
+                Cargando tipos de cambio...
+            </div>
+        </div>
     </div>
 
     <!-- BOTONES USUARIO / LOGIN -->
@@ -35,34 +38,33 @@
         <a href="{% url 'usuarios:login' %}" class="btn btn-outline-success">Login</a>
       {% endif %}
     </div>
-
-    {% comment %} <!-- BOTÓN TOGGLE PARA MOVILES -->
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent"
-            aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-  </div> {% endcomment %}
+  </div>
 </nav>
 
 <!-- SCRIPT PARA CARGAR INFO DE API EN EL DIV CENTRAL -->
-{% comment %} <script>
+<script>
 document.addEventListener('DOMContentLoaded', () => {
-    // Ejemplo de llamada a API (puede ser fetch AJAX)
     fetch('https://dolarapi.com/v1/dolares')
         .then(response => response.json())
         .then(data => {
-            const divApi = document.getElementById('info-api');
-            
-            if(data && data.mensaje) {
-                divApi.innerHTML = `<span class="text-white fw-bold">${data.mensaje}</span>`;
+            const ticker = document.getElementById('ticker-api');
+            if (data && Array.isArray(data)) {
+                const items = data.map(item => {
+                    return `<span class="ticker-item">
+                                ${item.nombre}: Compra $${item.compra} / Venta $${item.venta}
+                            </span>`;
+                }).join('');
+
+                // duplicamos el contenido para loop continuo
+                ticker.innerHTML = items + items;
             } else {
-                divApi.innerHTML = `<span class="text-white fw-bold">Sin información disponible</span>`;
+                ticker.innerHTML = 'Sin información disponible';
             }
         })
         .catch(error => {
-            const divApi = document.getElementById('info-api');
-            divApi.innerHTML = `<span class="text-warning fw-bold">Error cargando info</span>`;
+            const ticker = document.getElementById('ticker-api');
+            ticker.innerHTML = 'Error cargando info';
             console.error('Error API:', error);
         });
 });
-</script> {% endcomment %}
+</script>

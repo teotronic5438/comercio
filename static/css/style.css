@@ -262,4 +262,37 @@ hr {
 }
 
 
-/* estadistica B */
+/* PARA LA CINTA DE COTIZACIONES */
+
+/* Contenedor de la cinta */
+.ticker-container {
+    /*  background-color: #1E3A8A;  azul oscuro tipo tu tema */
+    color: #E0F2FE; /* texto azul muy claro */
+    overflow: hidden;
+    white-space: nowrap;
+    position: relative;
+    width: 1000px; /* ancho fijo del navbar */
+    font-weight: bold;
+    font-family: monospace;
+    border-radius: 0.25rem;
+}
+
+/* Elemento que se mueve */
+.ticker {
+    display: inline-block;
+    white-space: nowrap;
+    /* animación continua */
+    animation: scrollTicker 50s linear infinite;
+}
+
+/* Separación entre items */
+.ticker-item {
+    display: inline-block;
+    margin-right: 3rem;
+}
+
+/* Animación scroll: mover hasta la mitad del contenido duplicado */
+@keyframes scrollTicker {
+    0%   { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+}
