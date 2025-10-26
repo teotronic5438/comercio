@@ -1,13 +1,20 @@
 {% load static %}
 <nav class="navbar navbar-expand-lg shadow-sm navbar-gradient">
   <div class="container-fluid">
+    <!-- LOGO / BRAND -->
     <a class="navbar-brand d-flex align-items-center" href="{% url 'core:dashboard' %}">
-      <!-- <img src="{ % static 'img/enigma_img.jpg' % }" alt="LOGO DE RUBIC ENIGMA" width="30" height="30" class="me-2">
-      <span class="fw-bold">ENIGMA</span> -->
-      <div class="card-header"><img class="logo_form" src="{% static 'img/enigmaLogoNuevo.png' %}"  alt=""></div>
+      <div class="card-header p-0 bg-transparent border-0">
+        <img class="logo_form" src="{% static 'img/enigmaLogoNuevo.png' %}" alt="Enigma Logo">
+      </div>
     </a>
 
+    <!-- DIV CENTRAL PARA INFO DE API -->
+    <div class="mx-auto text-center d-none d-lg-block" id="info-api">
+      <!-- Aquí se cargará la info de la API -->
+      <span class="text-white fw-bold">Cargando información...</span>
+    </div>
 
+    <!-- BOTONES USUARIO / LOGIN -->
     <div class="d-flex ms-auto">
       {% if user.is_authenticated %}
         <div class="dropdown">
@@ -28,5 +35,34 @@
         <a href="{% url 'usuarios:login' %}" class="btn btn-outline-success">Login</a>
       {% endif %}
     </div>
-  </div>
+
+    {% comment %} <!-- BOTÓN TOGGLE PARA MOVILES -->
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent"
+            aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+  </div> {% endcomment %}
 </nav>
+
+<!-- SCRIPT PARA CARGAR INFO DE API EN EL DIV CENTRAL -->
+{% comment %} <script>
+document.addEventListener('DOMContentLoaded', () => {
+    // Ejemplo de llamada a API (puede ser fetch AJAX)
+    fetch('https://dolarapi.com/v1/dolares')
+        .then(response => response.json())
+        .then(data => {
+            const divApi = document.getElementById('info-api');
+            
+            if(data && data.mensaje) {
+                divApi.innerHTML = `<span class="text-white fw-bold">${data.mensaje}</span>`;
+            } else {
+                divApi.innerHTML = `<span class="text-white fw-bold">Sin información disponible</span>`;
+            }
+        })
+        .catch(error => {
+            const divApi = document.getElementById('info-api');
+            divApi.innerHTML = `<span class="text-warning fw-bold">Error cargando info</span>`;
+            console.error('Error API:', error);
+        });
+});
+</script> {% endcomment %}
