@@ -3,7 +3,11 @@ function fetchTickerData() {
         .then(response => response.json())
         .then(data => {
             const ticker = document.getElementById('ticker-api');
+
+            // Verifico que los datos existan y sean un array
             if (data && Array.isArray(data)) {
+
+                // Convierto cada item del array en un string HTML
                 const items = data.map(item => {
                     return `<span class="ticker-item">
                                 ${item.nombre}: Compra $${item.compra} / Venta $${item.venta}
