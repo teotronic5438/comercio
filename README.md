@@ -98,9 +98,8 @@ Luego accedé al sistema desde tu navegador en:
 
 ### 📌 Notas adicionales
 
-    Recordá crear un superusuario con python manage.py createsuperuser para acceder al admin.
+    Se debe crear un superusuario para acceder al panel de admninistracion.
 
-    Para mejor experiencia de usuario, la base se envia con datos de prueba
+    Para mejor experiencia de usuario, la base se envia con datos de prueba para entorno de desarrollo.
 
-    En caso de errores con las migraciones, se recomienda eliminar db.sqlite3 y la carpeta __pycache__ y repetir los pasos de migración. 
-    Si se precisa borrar BBDD debe crearse primero el superusuario y generar las tablas lokup necesarias (Estados, Depositos, Destinos y Productos).
+    Para entorno productivo se habilito la base en MYSQL, por lo que se debe crear primero el superusuario y generar las tablas lokup necesarias (Estados, Depositos, Destinos y Productos).
